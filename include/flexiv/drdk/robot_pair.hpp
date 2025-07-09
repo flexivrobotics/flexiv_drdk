@@ -236,7 +236,7 @@ public:
      * @param[in] timeout_sec Maximum time in seconds to wait for the fault to be successfully
      * cleared. Normally, a minor fault should take no more than 3 seconds to clear, and a critical
      * fault should take no more than 30 seconds to clear.
-     * @return True: cleared fault for this robot; false: failed to clear fault for this robot.
+     * @return True: cleared fault on this robot; false: failed to clear fault on this robot.
      * @throw std::runtime_error if failed to deliver the request to the connected robot pair.
      * @note This function blocks until the faults on both robots are successfully cleared or
      * [timeout_sec] has elapsed.
@@ -769,9 +769,8 @@ private:
     class Impl;
     std::unique_ptr<Impl> pimpl_;
 
-    friend class DevicePair;
     friend class GripperPair;
-    friend class ToolPair;
+    friend class BimanualPrimitives;
 };
 
 } /* namespace drdk */
