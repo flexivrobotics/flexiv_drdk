@@ -217,6 +217,16 @@ public:
      */
     void SwitchMode(Mode mode);
 
+    /**
+     * @brief [Blocking] Stop one robot in the pair and transit its control mode to IDLE.
+     * @param[in] mask True: stop this robot; false: skip this robot.
+     * @throw std::runtime_error if failed to stop the robot.
+     * @note This function blocks until the robot comes to a complete stop.
+     */
+    void Stop(std::pair<bool, bool> mask);
+
+    /**
+     * @overload Stop both robots in the pair and transit their control modes to IDLE.
      */
     void Stop();
 
