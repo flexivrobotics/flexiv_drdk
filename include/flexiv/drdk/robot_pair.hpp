@@ -213,9 +213,10 @@ public:
     void SwitchMode(const std::pair<Mode, Mode>& modes);
 
     /**
-     * @brief [Blocking] Stop both robots in the pair and transit their control modes to IDLE.
-     * @throw std::runtime_error if failed to stop either robot.
-     * @note This function blocks until both robots come to a complete stop.
+     * @overload Switch both robots in the pair to the same new control mode.
+     */
+    void SwitchMode(Mode mode);
+
      */
     void Stop();
 
