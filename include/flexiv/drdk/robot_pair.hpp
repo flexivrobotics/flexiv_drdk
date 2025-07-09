@@ -26,7 +26,7 @@ public:
     /**
      * @brief [Blocking] Instantiate the control interface of the robot pair. Background services
      * will be started and establish connection with the target robots.
-     * @param[in] robots_sn Serial numbers of the left and right arm respectively. The accepted
+     * @param[in] robots_sn Serial numbers of the left and right robot respectively. The accepted
      * formats are: "Rizon 4s-123456" and "Rizon4s-123456".
      * @param[in] translations_in_world Respective translations (x, y, z) of both robots' base
      * frames with regard to a shared world frame. To configure orientations, please use the Robot
