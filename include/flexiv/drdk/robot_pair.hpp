@@ -26,8 +26,12 @@ public:
     /**
      * @brief [Blocking] Instantiate the control interface of the robot pair. Background services
      * will be started and establish connection with the target robots.
-     * @param[in] robots_sn Serial numbers of the pair of robots to connect. The accepted formats
-     * are: "Rizon 4s-123456" and "Rizon4s-123456".
+     * @param[in] robots_sn Serial numbers of the left and right arm respectively. The accepted
+     * formats are: "Rizon 4s-123456" and "Rizon4s-123456".
+     * @param[in] translations_in_world Respective translations (x, y, z) of both robots' base
+     * frames with regard to a shared world frame. To configure orientations, please use the Robot
+     * Mounting setting in Flexiv Elements (under Settings -> Basic Safety Configuration). If left
+     * empty, the shared world frame coincides with both robots' base frame.
      * @param[in] network_interface_whitelist Limit the network interface(s) that can be used to try
      * to establish connection with the specified robots. The whitelisted network interface is
      * defined by its associated IPv4 address. For example, {"10.42.0.1", "192.168.2.102"}. If left
@@ -40,6 +44,7 @@ public:
      * and connection with both robots is established.
      */
     RobotPair(const std::pair<std::string, std::string>& robots_sn,
+        const std::pair<std::array<double, 3>, std::array<double, 3>>& translations_in_world = {},
         const std::vector<std::string>& network_interface_whitelist = {});
     virtual ~RobotPair();
 
