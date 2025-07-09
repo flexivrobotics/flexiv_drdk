@@ -31,7 +31,18 @@ After the ``flexivdrdk`` Python package is installed, it can be imported from an
     import flexivdrdk
     robot_pair = flexivdrdk.RobotPair(["Rizon4-100001", "Rizon4-100002"])
 
-The program will start searching for a pair of robots with serial numbers `Rizon4-100001` for the left arm and `Rizon4-100002` for the right arm, then exit after a couple of seconds if either of the specified robots is not found in the local network.
+The program will start searching for a pair of robots with serial numbers `Rizon4-100001` for the left robot and `Rizon4-100002` for the right robot, then exit after a couple of seconds if either of the specified robots is not found in the local network.
+
+### Run example Python scripts
+
+To run an example Python script in this repo:
+
+    cd flexiv_drdk/example_py
+    python3.x <example_name>.py [left_robot_sn] [right_robot_sn]
+
+For example:
+
+    python3.10 ./basics1_display_robot_states.py Rizon4-100001 Rizon4-100002
 
 ## Quick Start - C++
 
@@ -72,11 +83,32 @@ The following steps are identical on all supported platforms.
 
 ### Use the installed C++ library
 
-After the library is installed as ``flexiv_drdk`` CMake target, it can be linked from any other CMake projects. For example:
+After the library is installed as ``flexiv_drdk`` CMake target, it can be linked from any other CMake projects. Using the provided `flexiv_drdk-examples` project for instance:
 
-    cd my_project
+    cd flexiv_drdk/example
     mkdir build && cd build
     cmake .. -DCMAKE_PREFIX_PATH=~/drdk_install
     cmake --build . --config Release -j 4
 
 NOTE: ``-D`` followed by ``CMAKE_PREFIX_PATH`` tells the user project's CMake where to find the installed C++ library. This argument can be skipped if the DRDK library and its dependencies are installed to a globally discoverable location.
+
+### Run example C++ programs
+
+To run an example C++ program compiled during the previous step:
+
+    cd flexiv_drdk/example/build
+    ./<example_name> [left_robot_sn] [right_robot_sn]
+
+For example:
+
+    ./basics1_display_robot_states Rizon4-100001 Rizon4-100002
+
+## API Documentation
+
+The API documentation can be generated using Doxygen. For example, on Linux:
+
+    sudo apt install doxygen-latex graphviz
+    cd flexiv_drdk
+    doxygen doc/Doxyfile.in
+
+Open any html file under ``flexiv_drdk/doc/html/`` with your browser to view the doc.
