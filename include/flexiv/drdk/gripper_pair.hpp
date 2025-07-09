@@ -98,13 +98,18 @@ public:
         std::pair<double, double> force_limits);
 
     /**
-     * @brief [Blocking] Stop one or both the grippers and hold their current finger widths.
+     * @brief [Blocking] Stop one or both grippers and hold their current finger widths.
      * @param[in] mask True: stop this gripper; false: skip this gripper.
      * @throw std::logic_error if no gripper is enabled.
      * @throw std::runtime_error if failed to deliver the request to the connected robot pair.
      * @note This function blocks until the request is successfully delivered.
      */
     void Stop(std::pair<bool, bool> mask);
+
+    /**
+     * @overload Stop both grippers.
+     */
+    void Stop();
 
     /**
      * @brief [Non-blocking] Parameters of the currently enabled grippers.
