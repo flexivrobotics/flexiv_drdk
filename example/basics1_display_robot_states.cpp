@@ -74,9 +74,10 @@ int main(int argc, char* argv[])
         // Clear fault on the connected robots if any
         if (robot_pair.fault()) {
             spdlog::warn("Fault occurred on one of the connected robots, trying to clear ...");
-            // Try to clear the fault
+            // Try to clear the fault for both robots
             auto result = robot_pair.ClearFault();
-            if (!result.first || !result.second) {
+            // If fault is not cleared on both robots
+            if (!(result.first && result.second)) {
                 spdlog::error("Fault cannot be cleared, exiting ...");
                 return 1;
             }
