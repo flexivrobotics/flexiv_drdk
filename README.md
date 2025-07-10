@@ -19,7 +19,7 @@ Flexiv DRDK (Dual Robot Development Kit) is built on top of Flexiv RDK, with add
 
 On all supported platforms, the Python package of DRDK and its dependencies for a specific Python version can be installed using the `pip` module:
 
-    python3.x -m pip install numpy spdlog flexivdrdk
+    python3.x -m pip install numpy spdlog flexivrdk flexivdrdk
 
 NOTE: replace `3.x` with a specific Python version.
 

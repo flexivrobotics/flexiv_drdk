@@ -9,8 +9,8 @@ __copyright__ = "Copyright (C) 2016-2025 Flexiv Ltd. All Rights Reserved."
 __author__ = "Flexiv"
 
 import argparse
-import spdlog  # pip install spdlog
-import flexivdrdk  # pip install flexivdrdk
+import spdlog
+import flexivdrdk
 
 
 def main():

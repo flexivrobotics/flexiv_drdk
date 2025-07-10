@@ -12,9 +12,9 @@ __author__ = "Flexiv"
 import time
 import argparse
 import threading
-import spdlog  # pip install spdlog
-from flexivrdk import RobotStates  # pip install flexivrdk, for type definition
-import flexivdrdk  # pip install flexivdrdk
+import spdlog
+import flexivdrdk
+from flexivrdk import RobotStates  # for type definition
 
 
 def print_robot_states(robot_pair, logger, stop_event):
