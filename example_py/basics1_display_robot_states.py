@@ -13,6 +13,7 @@ import time
 import argparse
 import threading
 import spdlog  # pip install spdlog
+from flexivrdk import RobotStates  # pip install flexivrdk, for type definition
 import flexivdrdk  # pip install flexivdrdk
 
 
