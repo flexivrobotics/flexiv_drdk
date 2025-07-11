@@ -1,0 +1,37 @@
+#!/bin/sh
+# This script builds from source and installs all dependencies of flexiv_drdk.
+
+# Absolute path of this script
+SCRIPTPATH="$(dirname $(readlink -f $0))"
+set -e
+
+# Check script arguments
+if [ "$#" -lt 1 ]; then
+    echo "Error: invalid script argument"
+    echo "Required argument: [install_directory_path]"
+    echo "    install_directory_path: directory to install all dependencies, should be the same as the install directory of flexiv_drdk"
+    echo "Optional argument: [num_parallel_jobs]"
+    echo "    num_parallel_jobs: number of parallel jobs used to build, use 4 if not specified"
+    exit
+fi
+
+# Get dependencies install directory from script argument, should be the same as the install directory of flexiv_drdk
+INSTALL_DIR=$1
+echo "Dependencies will be installed to: $INSTALL_DIR"
+
+# Use specified number for parallel build jobs, otherwise use 4
+if [ -n "$2" ] ;then
+    NUM_JOBS=$2
+else
+    NUM_JOBS=4
+fi
+echo "Number of parallel build jobs: $NUM_JOBS"
+
+
+# Clone all dependencies in a subfolder
+mkdir -p cloned && cd cloned
+
+# Build and install all dependencies to INSTALL_DIR
+bash $SCRIPTPATH/scripts/install_flexiv_rdk.sh $INSTALL_DIR $NUM_JOBS
+
+echo ">>>>>>>>>> Finished <<<<<<<<<<"
