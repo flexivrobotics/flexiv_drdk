@@ -16,22 +16,29 @@ if [ "$#" -lt 1 ]; then
 fi
 
 # Get dependencies install directory from script argument, should be the same as the install directory of flexiv_drdk
-INSTALL_DIR=$1
+export INSTALL_DIR=$1
 echo "Dependencies will be installed to: $INSTALL_DIR"
 
 # Use specified number for parallel build jobs, otherwise use 4
 if [ -n "$2" ] ;then
-    NUM_JOBS=$2
+    export NUM_JOBS=$2
 else
-    NUM_JOBS=4
+    export NUM_JOBS=4
 fi
 echo "Number of parallel build jobs: $NUM_JOBS"
 
+# Set shared cmake arguments
+export SHARED_CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release \
+                          -DBUILD_SHARED_LIBS=OFF \
+                          -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+                          -DCMAKE_PREFIX_PATH=$INSTALL_DIR \
+                          -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
+                          -DBUILD_TESTING=OFF"
 
 # Clone all dependencies in a subfolder
 mkdir -p cloned && cd cloned
 
 # Build and install all dependencies to INSTALL_DIR
-bash $SCRIPTPATH/scripts/install_flexiv_rdk.sh $INSTALL_DIR $NUM_JOBS
+bash $SCRIPTPATH/scripts/install_flexiv_rdk.sh
 
 echo ">>>>>>>>>> Finished <<<<<<<<<<"
