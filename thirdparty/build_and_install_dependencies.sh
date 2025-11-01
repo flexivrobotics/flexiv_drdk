@@ -40,5 +40,11 @@ mkdir -p cloned && cd cloned
 
 # Build and install all dependencies to INSTALL_DIR
 bash $SCRIPTPATH/scripts/install_flexiv_rdk.sh
+bash $SCRIPTPATH/scripts/install_boost.sh
+bash $SCRIPTPATH/scripts/install_assimp.sh
+bash $SCRIPTPATH/scripts/install_coal.sh
+bash $SCRIPTPATH/scripts/install_console_bridge.sh
+bash $SCRIPTPATH/scripts/install_urdfdom_headers.sh
+bash $SCRIPTPATH/scripts/install_urdfdom.sh
 
 echo ">>>>>>>>>> Finished <<<<<<<<<<"
