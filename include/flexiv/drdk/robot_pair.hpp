@@ -940,6 +940,7 @@ private:
 
     friend class GripperPair;
     friend class BimanualPrimitives;
+    friend class SelfCollisionMonitor;
 };
 
 } /* namespace drdk */
