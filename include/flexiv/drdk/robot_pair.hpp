@@ -501,6 +501,29 @@ public:
     void StreamJointTorque(const std::pair<std::vector<double>, std::vector<double>>& torques,
         std::pair<bool, bool> enable_gravity_comp = {true, true},
         std::pair<bool, bool> enable_soft_limits = {true, true});
+
+    /**
+     * @brief [Non-blocking] Continuously stream joint position, velocity, and acceleration commands
+     * to both robots in the pair. The commands are tracked by either the joint impedance controller
+     * or the joint position controller, depending on the control mode.
+     * @param[in] positions Respective target joint positions: \f$ q_d \in \mathbb{R}^{n \times 1}
+     * \f$ for each robot. Unit: \f$ [rad] \f$.
+     * @param[in] velocities Respective target joint velocities: \f$ \dot{q}_d \in \mathbb{R}^{n
+     * \times 1} \f$ for each robot. Unit: \f$ [rad/s] \f$.
+     * @param[in] accelerations Respective target joint accelerations: \f$ \ddot{q}_d \in
+     * \mathbb{R}^{n \times 1} \f$ for each robot. Unit: \f$ [rad/s^2] \f$.
+     * @throw std::invalid_argument if size of any input vector does not match robot DoF.
+     * @throw std::logic_error if robot is not in the correct control mode.
+     * @throw std::runtime_error if number of timeliness failures has reached limit.
+     * @note Applicable control modes: RT_JOINT_IMPEDANCE, RT_JOINT_POSITION.
+     * @note Real-time (RT).
+     * @warning Always stream smooth and continuous commands to avoid sudden movements.
+     * @see SetJointImpedance().
+     */
+    void StreamJointPosition(const std::pair<std::vector<double>, std::vector<double>>& positions,
+        const std::pair<std::vector<double>, std::vector<double>>& velocities,
+        const std::pair<std::vector<double>, std::vector<double>>& accelerations);
+
      * @param[in] positions Respective target joint positions: \f$ q_d \in \mathbb{R}^{n \times 1}
      * \f$ for each robot. Unit: \f$ [rad] \f$.
      * @param[in] velocities Respective target joint velocities: \f$ \dot{q}_d \in \mathbb{R}^{n
