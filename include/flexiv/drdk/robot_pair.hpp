@@ -292,6 +292,17 @@ public:
      */
     void LockExternalAxes(std::pair<bool, bool> toggles);
 
+    /**
+     * @brief [Blocking] Sync/unsync TCP motion of the robot pair with the movement of the
+     * positioners (if any) during primitive execution.
+     * @param[in] toggles True: the motion sync for this robot is on; false: motion sync for this
+     * robot is off. By default, the motion sync is off for both robots.
+     * @throw std::runtime_error if failed to deliver the request to the connected robot pair.
+     * @note Only applicable to certain primitives that support motion sync with the positioner.
+     * @note This function blocks until the request is successfully delivered.
+     */
+    void SyncWithPositioner(std::pair<bool, bool> toggles);
+
     //======================================= PLAN EXECUTION =======================================
     /**
      * @brief [Blocking] Execute plans simultaneously on both robots in the pair by specifying plan
