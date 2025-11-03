@@ -484,10 +484,23 @@ public:
 
     //==================================== DIRECT JOINT CONTROL ====================================
     /**
-     * @brief [Non-blocking] Discretely send joint position, velocity, and acceleration command to
-     * both robots in the pair. The robot's internal motion generator will smoothen the discrete
-     * commands, which are tracked by either the joint impedance controller or the joint position
-     * controller, depending on the control mode.
+     * @brief [Non-blocking] Continuously stream joint torque commands to both robots in the pair.
+     * @param[in] torques Respective target joint torques: \f$ {\tau_J}_d \in \mathbb{R}^{n \times
+     * 1} \f$ for each robot. Unit: \f$ [Nm] \f$.
+     * @param[in] enable_gravity_comp Enable/disable robot gravity compensation for this robot.
+     * @param[in] enable_soft_limits Enable/disable soft limits for this robot to keep the joints
+     * from moving outside allowed position range, which will trigger a safety fault that requires
+     * recovery operation.
+     * @throw std::invalid_argument if size of any input vector does not match robot DoF.
+     * @throw std::logic_error if robot is not in the correct control mode.
+     * @throw std::runtime_error if number of timeliness failures has reached limit.
+     * @note Applicable control modes: RT_JOINT_TORQUE.
+     * @note Real-time (RT).
+     * @warning Always stream smooth and continuous commands to avoid sudden movements.
+     */
+    void StreamJointTorque(const std::pair<std::vector<double>, std::vector<double>>& torques,
+        std::pair<bool, bool> enable_gravity_comp = {true, true},
+        std::pair<bool, bool> enable_soft_limits = {true, true});
      * @param[in] positions Respective target joint positions: \f$ q_d \in \mathbb{R}^{n \times 1}
      * \f$ for each robot. Unit: \f$ [rad] \f$.
      * @param[in] velocities Respective target joint velocities: \f$ \dot{q}_d \in \mathbb{R}^{n
