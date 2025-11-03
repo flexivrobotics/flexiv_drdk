@@ -50,44 +50,40 @@ endif()
 # Threads
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
-if(Threads_FOUND)
-  message(STATUS "Found Threads: HAVE_PTHREAD = ${THREADS_HAVE_PTHREAD_ARG}")
-endif()
+message(STATUS "Found Threads")
 
 # Flexiv RDK
 find_package(flexiv_rdk REQUIRED)
-if(flexiv_rdk_FOUND)
-  message(STATUS "Found flexiv_rdk: ${flexiv_rdk_DIR}")
-endif()
+message(STATUS "Found flexiv_rdk v${flexiv_rdk_VERSION}: ${flexiv_rdk_DIR}")
 
 # ===================================================================
 #      CREATE LIBRARY
 # ===================================================================
-# Create an INTERFACE library with no source file to compile
-add_library(${PROJECT_NAME} INTERFACE)
+# Create static library target with dummy source
+add_library(${PROJECT_NAME} STATIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/dummy.cpp)
 
-# Create an alias of the library using flexiv namespace,
-# to imitate the install target which uses flexiv namespace.
+# Create an alias of the target with flexiv namespace
 add_library(flexiv::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-target_include_directories(${PROJECT_NAME} INTERFACE
+# Set include directories
+target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(${PROJECT_NAME} INTERFACE
-  ${CMAKE_CURRENT_SOURCE_DIR}/lib/${RDK_STATIC_LIB}
+# Link to dependencies
+target_link_libraries(${PROJECT_NAME} PUBLIC
   Threads::Threads
   flexiv::flexiv_rdk
 )
 
 # Use moderate compiler warning option
 if(CMAKE_HOST_UNIX)
-  target_compile_options(${PROJECT_NAME} INTERFACE -Wall -Wextra)
+  target_compile_options(${PROJECT_NAME} PUBLIC -Wall -Wextra)
 else()
-  target_compile_options(${PROJECT_NAME} INTERFACE /W1)
+  target_compile_options(${PROJECT_NAME} PUBLIC /W1)
 endif()
 
-# Install the INTERFACE library
+# Install the library
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FlexivInstallLibrary.cmake)
 FlexivInstallLibrary()
