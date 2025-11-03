@@ -47,14 +47,21 @@ endif()
 # ===================================================================
 #      PROJECT DEPENDENCIES
 # ===================================================================
-# Threads
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
-message(STATUS "Found Threads")
-
-# Flexiv RDK
+# flexiv_rdk
 find_package(flexiv_rdk REQUIRED)
 message(STATUS "Found flexiv_rdk v${flexiv_rdk_VERSION}: ${flexiv_rdk_DIR}")
+
+# assimp: dependency of coal but coal didn't handle it well so we need to find it for coal
+find_package(assimp REQUIRED)
+message(STATUS "Found assimp v${assimp_VERSION}: ${assimp_DIR}")
+
+# coal
+find_package(coal REQUIRED)
+message(STATUS "Found coal v${coal_VERSION}: ${coal_DIR}")
+
+# urdfdom
+find_package(urdfdom REQUIRED)
+message(STATUS "Found urdfdom v${urdfdom_VERSION}: ${urdfdom_DIR}")
 
 # ===================================================================
 #      CREATE LIBRARY
@@ -73,8 +80,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 # Link to dependencies
 target_link_libraries(${PROJECT_NAME} PUBLIC
-  Threads::Threads
   flexiv::flexiv_rdk
+  coal::coal
+  urdfdom::urdf_parser
 )
 
 # Use moderate compiler warning option
