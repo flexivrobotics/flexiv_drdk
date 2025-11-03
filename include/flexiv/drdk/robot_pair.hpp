@@ -358,6 +358,27 @@ public:
     void PausePlan(std::pair<bool, bool> toggles);
 
     /**
+     * @brief [Blocking] Stop one robot in the pair and transit its control mode to IDLE.
+     * @param[in] mask True: stop this robot; false: skip this robot.
+     * @throw std::runtime_error if failed to stop the robot.
+     * @note This function blocks until the robot comes to a complete stop.
+     */
+    /**
+     * @brief [Blocking] Stop the execution of the current plan for one robot in the pair.
+     * @param[in] mask True: stop plan for this robot; false: skip this robot.
+     * @throw std::logic_error if either robot is not in the correct control mode.
+     * @throw std::runtime_error if failed to deliver the request to the connected robot pair.
+     * @note Applicable control modes: NRT_PLAN_EXECUTION.
+     * @note This function blocks until the request is successfully delivered.
+     */
+    void StopPlan(std::pair<bool, bool> mask);
+
+    /**
+     * @overload Stop the execution of the current plan for both robots in the pair.
+     */
+    void StopPlan();
+
+    /**
      * @brief [Blocking] Lists of all available plans from both robots in the pair.
      * @return Respective available plans as string lists.
      * @throw std::runtime_error if failed to get a reply from the connected robot pair.
