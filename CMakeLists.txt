@@ -16,24 +16,32 @@ message(STATUS "OS: ${CMAKE_SYSTEM_NAME}")
 message(STATUS "Processor: ${CMAKE_SYSTEM_PROCESSOR}")
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
-    set(RDK_STATIC_LIB "libflexiv_drdk.x86_64-linux-gnu.a")
+    set(DRDK_LIB "libflexiv_drdk.x86_64-linux-gnu.a")
   elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
-    set(RDK_STATIC_LIB "libflexiv_drdk.aarch64-linux-gnu.a")
+    set(DRDK_LIB "libflexiv_drdk.aarch64-linux-gnu.a")
   else()
     message(FATAL_ERROR "Linux with ${CMAKE_SYSTEM_PROCESSOR} processor is currently not supported.")
   endif()
-elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm64")
-    set(RDK_STATIC_LIB "libflexiv_drdk.arm64-darwin.a")
-  else()
-    message(FATAL_ERROR "Mac with ${CMAKE_SYSTEM_PROCESSOR} processor is currently not supported.")
-  endif()
-elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-  if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "AMD64")
-    set(RDK_STATIC_LIB "flexiv_drdk.win_amd64.lib")
-  else()
-    message(FATAL_ERROR "Windows with ${CMAKE_SYSTEM_PROCESSOR} processor is currently not supported.")
-  endif()
+else()
+    message(FATAL_ERROR "${CMAKE_SYSTEM_NAME} is currently not supported.")
+endif()
+
+# Parse expected hash of the library file
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/lib/${DRDK_LIB}.sha256 EXPECTED_HASH)
+
+# Download the library file from GitHub 
+set(DRDK_LIB_URL https://github.com/flexivrobotics/flexiv_drdk/releases/download/v1.1/${DRDK_LIB})
+message(STATUS "Downloading ${DRDK_LIB_URL} ...")
+file(DOWNLOAD ${DRDK_LIB_URL} ${CMAKE_CURRENT_BINARY_DIR}/${DRDK_LIB}
+     SHOW_PROGRESS
+     TLS_VERIFY ON
+     EXPECTED_HASH SHA256=${EXPECTED_HASH}
+     STATUS status)
+list(GET status 0 code)
+if(code EQUAL 0)
+  message(STATUS "Download finished")
+else()
+  message(FATAL_ERROR "Download failed: ${status}")
 endif()
 
 # ===================================================================
