@@ -524,19 +524,22 @@ public:
         const std::pair<std::vector<double>, std::vector<double>>& velocities,
         const std::pair<std::vector<double>, std::vector<double>>& accelerations);
 
+    /**
+     * @brief [Non-blocking] Discretely send joint position and velocity commands to both robots in
+     * the pair. The robot's internal motion generator will smoothen the discrete commands, which
+     * are tracked by either the joint impedance controller or the joint position controller,
+     * depending on the control mode.
      * @param[in] positions Respective target joint positions: \f$ q_d \in \mathbb{R}^{n \times 1}
      * \f$ for each robot. Unit: \f$ [rad] \f$.
      * @param[in] velocities Respective target joint velocities: \f$ \dot{q}_d \in \mathbb{R}^{n
      * \times 1} \f$ for each robot. Each joint will maintain this amount of velocity when it
      * reaches the target position. Unit: \f$ [rad/s] \f$.
-     * @param[in] accelerations Respective target joint accelerations: \f$ \ddot{q}_d \in
-     * \mathbb{R}^{n \times 1} \f$ for each robot. Each joint will maintain this amount of
-     * acceleration when it reaches the target position. Unit: \f$ [rad/s^2] \f$.
      * @param[in] max_vel Respective maximum joint velocities for the planned trajectory: \f$
      * \dot{q}_{max} \in \mathbb{R}^{n \times 1} \f$ for each robot. Unit: \f$ [rad/s] \f$.
      * @param[in] max_acc Respective maximum joint accelerations for the planned trajectory: \f$
      * \ddot{q}_{max} \in \mathbb{R}^{n \times 1} \f$ for each robot. Unit: \f$ [rad/s^2] \f$.
-     * @throw std::invalid_argument if size of any input vector does not match robot DoF.
+     * @throw std::invalid_argument if size of any input vector does not match robot DoF, or
+     * [max_vel] or [max_acc] contains any non-positive value.
      * @throw std::logic_error if either robot is not in the correct control mode.
      * @note Applicable control modes: NRT_JOINT_IMPEDANCE, NRT_JOINT_POSITION.
      * @warning Calling this function a second time while the motion from the previous call is still
@@ -546,7 +549,6 @@ public:
      */
     void SendJointPosition(const std::pair<std::vector<double>, std::vector<double>>& positions,
         const std::pair<std::vector<double>, std::vector<double>>& velocities,
-        const std::pair<std::vector<double>, std::vector<double>>& accelerations,
         const std::pair<std::vector<double>, std::vector<double>>& max_vel,
         const std::pair<std::vector<double>, std::vector<double>>& max_acc);
 
