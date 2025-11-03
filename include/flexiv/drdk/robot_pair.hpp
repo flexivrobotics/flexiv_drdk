@@ -589,6 +589,26 @@ public:
     void SetMaxContactTorque(
         const std::pair<std::vector<double>, std::vector<double>>& max_torques);
 
+    /**
+     * @brief [Blocking] For both robots in the pair, set inertia shaping scales for the joint
+     * motion controller used in the joint impedance control modes.
+     * @param[in] inertia_scales Respective inertia shaping scales: \f$ \sigma_q \in \mathbb{R}^{n
+     * \times 1} \f$ for each robot. Valid range: [0.75, 1.0]. The nominal (safe) value is 1.0,
+     * which means no shaping.
+     * @throw std::invalid_argument if [inertia_scales] contains any value outside the valid range
+     * or its size does not match robot DoF.
+     * @throw std::logic_error if robot is not in an applicable control mode.
+     * @throw std::runtime_error if failed to deliver the request to the connected robot pair.
+     * @note Applicable control modes: RT_JOINT_IMPEDANCE, NRT_JOINT_IMPEDANCE.
+     * @note This function blocks until the request is successfully delivered.
+     * @par Joint inertia shaping
+     * In joint impedance control modes, it is possible to shape down the natural inertia of the
+     * joints to make them behave as if they are lighter. The parameter [inertia_scales] sets the
+     * scale of shaped/natural inertia for each joint. Smaller scale corresponds to lighter inertia.
+     */
+    void SetJointInertiaScale(
+        const std::pair<std::vector<double>, std::vector<double>>& inertia_scales);
+
     //================================== DIRECT CARTESIAN CONTROL ==================================
     /**
      * @brief [Non-blocking] Discretely send Cartesian motion and/or force command to both robots in
