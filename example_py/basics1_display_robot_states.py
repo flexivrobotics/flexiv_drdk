@@ -104,7 +104,7 @@ def main():
     )
 
     try:
-        # RDK Initialization
+        # DRDK Initialization
         # ==========================================================================================
         # Instantiate robot pair interface
         robot_pair = flexivdrdk.RobotPair([args.left_robot_sn, args.right_robot_sn])

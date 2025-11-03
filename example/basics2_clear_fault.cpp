@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
         "the connected robots.\n");
 
     try {
-        // RDK Initialization
+        // DRDK Initialization
         // =========================================================================================
         // Instantiate robot pair interface
         drdk::RobotPair robot_pair({left_robot_sn, right_robot_sn});
