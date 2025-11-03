@@ -663,6 +663,10 @@ public:
         = {},
         const std::pair<std::array<double, kCartDoF>, std::array<double, kCartDoF>>& accelerations
         = {});
+
+    /**
+     * @brief [Non-blocking] Discretely send Cartesian motion and/or force commands to both robots
+     * in the pair for them to track using its unified motion-force controller, which allows doing
      * force control in zero or more Cartesian axes and motion control in the rest axes. The robot's
      * internal motion generator will smoothen the discrete commands.
      * @param[in] poses Respective target TCP poses in world frame: \f$ {^{O}T_{TCP}}_{d} \in
@@ -674,6 +678,13 @@ public:
      * 1} \f$ for each robot. The robot will track the target wrench using an explicit force
      * controller. Consists of \f$ \mathbb{R}^{3 \times 1} \f$ force and \f$ \mathbb{R}^{3 \times 1}
      * \f$ moment: \f$ [f_x, f_y, f_z, m_x, m_y, m_z]^T \f$. Unit: \f$ [N]:[Nm] \f$.
+     * @param[in] velocities Respective target TCP velocities (linear and angular) in world frame
+     * when reaching the target poses specified above: \f$ ^{0}\dot{x}_d \in \mathbb{R}^{6 \times 1}
+     * \f$ for each robot. Providing properly calculated target velocity can improve the robot's
+     * overall tracking performance at the cost of reduced robustness. Leaving this input 0 can
+     * maximize robustness at the cost of reduced tracking performance. Consists of \f$
+     * \mathbb{R}^{3 \times 1} \f$ linear and \f$ \mathbb{R}^{3 \times 1} \f$ angular velocity.
+     * Unit: \f$ [m/s]:[rad/s] \f$.
      * @param[in] max_linear_vel Respective maximum Cartesian linear velocities when moving to the
      * target poses. A safe value is provided as default. Unit: \f$ [m/s] \f$.
      * @param[in] max_angular_vel Respective maximum Cartesian angular velocities when moving to the
@@ -704,6 +715,8 @@ public:
     void SendCartesianMotionForce(
         const std::pair<std::array<double, kPoseSize>, std::array<double, kPoseSize>>& poses,
         const std::pair<std::array<double, kCartDoF>, std::array<double, kCartDoF>>& wrenches = {},
+        const std::pair<std::array<double, kCartDoF>, std::array<double, kCartDoF>>& velocities
+        = {},
         std::pair<double, double> max_linear_vel = {0.5, 0.5},
         std::pair<double, double> max_angular_vel = {1.0, 1.0},
         std::pair<double, double> max_linear_acc = {2.0, 2.0},
