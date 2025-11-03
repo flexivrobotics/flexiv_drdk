@@ -611,8 +611,58 @@ public:
 
     //================================== DIRECT CARTESIAN CONTROL ==================================
     /**
-     * @brief [Non-blocking] Discretely send Cartesian motion and/or force command to both robots in
-     * the pair for them to track using its unified motion-force controller, which allows doing
+     * @brief [Non-blocking] Continuously stream Cartesian motion and/or force commands to both
+     * robots in the pair for them to track using its unified motion-force controller, which allows
+     * doing force control in zero or more Cartesian axes and motion control in the rest axes.
+     * @param[in] poses Respective target TCP poses in world frame: \f$ {^{O}T_{TCP}}_{d} \in
+     * \mathbb{R}^{7 \times 1} \f$ for each robot. Consists of \f$ \mathbb{R}^{3 \times 1} \f$
+     * position and \f$ \mathbb{R}^{4 \times 1} \f$ quaternion: \f$ [x, y, z, q_w, q_x, q_y, q_z]^T
+     * \f$. Unit: \f$ [m]:[] \f$.
+     * @param[in] wrenches Respective target TCP wrenches (force and moment) in the force control
+     * reference frame (configured by SetForceControlFrame()): \f$ ^{0}F_d \in \mathbb{R}^{6 \times
+     * 1} \f$ for each robot. The robot will track the target wrench using an explicit force
+     * controller. Consists of \f$ \mathbb{R}^{3 \times 1} \f$ force and \f$ \mathbb{R}^{3 \times 1}
+     * \f$ moment: \f$ [f_x, f_y, f_z, m_x, m_y, m_z]^T \f$. Unit: \f$ [N]:[Nm] \f$.
+     * @param[in] c Respective target TCP velocities (linear and angular) in world frame: \f$
+     * ^{0}\dot{x}_d \in \mathbb{R}^{6 \times 1} \f$ for each robot. Providing properly calculated
+     * target velocity can improve the robot's overall tracking performance at the cost of reduced
+     * robustness. Leaving this input 0 can maximize robustness at the cost of reduced tracking
+     * performance. Consists of \f$ \mathbb{R}^{3 \times 1} \f$ linear and \f$ \mathbb{R}^{3 \times
+     * 1} \f$ angular velocity. Unit: \f$ [m/s]:[rad/s] \f$.
+     * @param[in] accelerations Respective target TCP accelerations (linear and angular) in world
+     * frame: \f$ ^{0}\ddot{x}_d \in \mathbb{R}^{6 \times 1} \f$ for each robot. Feeding forward
+     * target acceleration can improve the robot's tracking performance for highly dynamic motions,
+     * but it's also okay to leave this input 0. Consists of \f$ \mathbb{R}^{3 \times 1} \f$ linear
+     * and \f$ \mathbb{R}^{3 \times 1} \f$ angular acceleration. Unit: \f$ [m/s^2]:[rad/s^2] \f$.
+     * @throw std::logic_error if robot is not in the correct control mode.
+     * @throw std::runtime_error if number of timeliness failures has reached limit.
+     * @note Applicable control modes: RT_CARTESIAN_MOTION_FORCE.
+     * @note Real-time (RT).
+     * @warning Always stream smooth and continuous motion commands to avoid sudden movements. The
+     * force commands don't need to be continuous.
+     * @warning Same as Flexiv Elements, the target wrench is expressed as wrench sensed at TCP
+     * instead of wrench exerted by TCP. E.g. commanding f_z = +5 N will make the end-effector move
+     * towards -Z direction, so that upon contact, the sensed force will be +5 N.
+     * @par How to achieve pure motion control?
+     * Use SetForceControlAxis() to disable force control for all Cartesian axes to achieve pure
+     * motion control. This function does pure motion control by default.
+     * @par How to achieve pure force control?
+     * Use SetForceControlAxis() to enable force control for all Cartesian axes to achieve pure
+     * force control, active or passive.
+     * @par How to achieve unified motion-force control?
+     * Use SetForceControlAxis() to enable force control for one or more Cartesian axes and leave
+     * the rest axes motion-controlled, then provide target pose for the motion-controlled axes and
+     * target wrench for the force-controlled axes.
+     * @see SetCartesianImpedance(), SetMaxContactWrench(), SetNullSpacePosture(),
+     * SetForceControlAxis(), SetForceControlFrame(), SetPassiveForceControl().
+     */
+    void StreamCartesianMotionForce(
+        const std::pair<std::array<double, kPoseSize>, std::array<double, kPoseSize>>& poses,
+        const std::pair<std::array<double, kCartDoF>, std::array<double, kCartDoF>>& wrenches = {},
+        const std::pair<std::array<double, kCartDoF>, std::array<double, kCartDoF>>& velocities
+        = {},
+        const std::pair<std::array<double, kCartDoF>, std::array<double, kCartDoF>>& accelerations
+        = {});
      * force control in zero or more Cartesian axes and motion control in the rest axes. The robot's
      * internal motion generator will smoothen the discrete commands.
      * @param[in] poses Respective target TCP poses in world frame: \f$ {^{O}T_{TCP}}_{d} \in
