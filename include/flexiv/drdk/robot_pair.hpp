@@ -573,6 +573,22 @@ public:
     void SetJointImpedance(const std::pair<std::vector<double>, std::vector<double>>& K_q,
         const std::pair<std::vector<double>, std::vector<double>>& Z_q = {});
 
+    /**
+     * @brief [Blocking] For both robots in the pair, set maximum contact torques for the joint
+     * motion controller used in the joint impedance control modes. The controller will regulate its
+     * output to maintain contact torques with the environment under the set values.
+     * @param[in] max_torques Respective maximum contact torques: \f$ tau_q \in \mathbb{R}^{n \times
+     * 1} \f$ for each robot. Valid range: [0, RobotInfo::tau_max]. Unit: \f$ [Nm] \f$.
+     * @throw std::invalid_argument if [max_torques] contains any value outside the valid range or
+     * its size does not match robot DoF.
+     * @throw std::logic_error if either robot is not in the correct control mode.
+     * @throw std::runtime_error if failed to deliver the request to the connected robot pair.
+     * @note Applicable control modes: RT_JOINT_IMPEDANCE, NRT_JOINT_IMPEDANCE.
+     * @note This function blocks until the request is successfully delivered.
+     */
+    void SetMaxContactTorque(
+        const std::pair<std::vector<double>, std::vector<double>>& max_torques);
+
     //================================== DIRECT CARTESIAN CONTROL ==================================
     /**
      * @brief [Non-blocking] Discretely send Cartesian motion and/or force command to both robots in
