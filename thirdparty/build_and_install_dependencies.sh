@@ -2,7 +2,7 @@
 # This script builds from source and installs all dependencies of flexiv_drdk.
 
 # Absolute path of this script
-SCRIPTPATH="$(dirname $(readlink -f $0))"
+export SCRIPTPATH="$(dirname $(readlink -f $0))"
 set -e
 
 # Check script arguments
