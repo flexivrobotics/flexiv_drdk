@@ -20,7 +20,7 @@ fi
 git submodule update --init --recursive
 
 # Apply patch to remove forced building shared library
-git apply $SCRIPTPATH/patches/coal.patch
+git apply $SCRIPTPATH/patches/$REPO.patch
 
 # Configure CMake
 mkdir -p build && cd build

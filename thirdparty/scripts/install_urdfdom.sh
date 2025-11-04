@@ -17,6 +17,9 @@ else
   git checkout $VER_TAG
 fi
 
+# Apply patch to remove forced building shared library
+git apply $SCRIPTPATH/patches/$REPO.patch
+
 # Configure CMake
 mkdir -p build && cd build
 cmake .. $SHARED_CMAKE_ARGS \
