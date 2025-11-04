@@ -20,6 +20,7 @@ fi
 git submodule update --init --recursive
 
 # Apply patch to remove forced building shared library
+git reset --hard
 git apply $SCRIPTPATH/patches/$REPO.patch
 
 # Configure CMake
