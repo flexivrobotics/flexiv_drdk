@@ -1,5 +1,5 @@
 diff --git a/urdf_parser/CMakeLists.txt b/urdf_parser/CMakeLists.txt
-index a0cef4d..0cac2ca 100644
+index a0cef4d..89e7b80 100644
 --- a/urdf_parser/CMakeLists.txt
 +++ b/urdf_parser/CMakeLists.txt
 @@ -3,7 +3,7 @@ macro(add_urdfdom_library)
@@ -11,12 +11,3 @@ index a0cef4d..0cac2ca 100644
      ${add_urdfdom_library_SOURCES})
    add_library(urdfdom::${add_urdfdom_library_LIBNAME} ALIAS ${add_urdfdom_library_LIBNAME})
    target_include_directories(${add_urdfdom_library_LIBNAME} PUBLIC
-@@ -13,7 +13,7 @@ macro(add_urdfdom_library)
-     ${add_urdfdom_library_LINK}
-     ${urdfdom_headers_link_libs}
-   )
--  target_link_libraries(${add_urdfdom_library_LIBNAME} PRIVATE
-+  target_link_libraries(${add_urdfdom_library_LIBNAME} PUBLIC
-     ${console_bridge_link_libs}
-     tinyxml2::tinyxml2
-   )
