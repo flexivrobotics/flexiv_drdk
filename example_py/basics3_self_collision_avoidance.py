@@ -87,7 +87,7 @@ def main():
         logger.info("Moving the robots towards each other")
         robot_pair.SwitchMode(Mode.NRT_CARTESIAN_MOTION_FORCE)
         target_pose = [0.5, 0.0, 0.3, 0, 0, 1, 0]
-        robot_pair.SendCartesianMotionForce({target_pose, target_pose})
+        robot_pair.SendCartesianMotionForce([target_pose, target_pose])
 
         # Both robots will stop before they hit each other
         time.sleep(1)
