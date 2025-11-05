@@ -7,9 +7,9 @@ Flexiv DRDK (Dual Robot Development Kit) is built on top of Flexiv RDK, with add
 
 ## Environment Compatibility
 
-| **OS**                | **Platform**  | **C++ compiler kit** | **Python interpreter** |
-| --------------------- | ------------- | -------------------- | ---------------------- |
-| Linux (Ubuntu 20.04+) | x86_64, arm64 | GCC   v9.4+          | 3.8, 3.10, 3.12        |
+| **OS**                | **Platform**    | **C++ compiler kit** | **Python interpreter** |
+| --------------------- | --------------- | -------------------- | ---------------------- |
+| Linux (Ubuntu 22.04+) | x86_64, aarch64 | GCC   v11.4+         | 3.10, 3.12             |
 
 **IMPORTANT**: You might need to turn off your computer's firewall or whitelist the DRDK programs to be able to establish connection with the robot.
 
