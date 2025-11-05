@@ -1,0 +1,12 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index b7512e0d..026072a6 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -136,7 +136,6 @@ list(
+ )
+ add_library(
+   ${LIBRARY_NAME}
+-  SHARED
+   ${PROJECT_HEADERS_FULL_PATH}
+   ${${LIBRARY_NAME}_SOURCES}
+ )

@@ -16,6 +16,7 @@ endif()
 set(EXAMPLE_LIST
   basics1_display_robot_states
   basics2_clear_fault
+  basics3_self_collision_avoidance
 )
 
 # Find flexiv_drdk INTERFACE library

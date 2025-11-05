@@ -292,6 +292,17 @@ public:
      */
     void LockExternalAxes(std::pair<bool, bool> toggles);
 
+    /**
+     * @brief [Blocking] Sync/unsync TCP motion of the robot pair with the movement of the
+     * positioners (if any) during primitive execution.
+     * @param[in] toggles True: the motion sync for this robot is on; false: motion sync for this
+     * robot is off. By default, the motion sync is off for both robots.
+     * @throw std::runtime_error if failed to deliver the request to the connected robot pair.
+     * @note Only applicable to certain primitives that support motion sync with the positioner.
+     * @note This function blocks until the request is successfully delivered.
+     */
+    void SyncWithPositioner(std::pair<bool, bool> toggles);
+
     //======================================= PLAN EXECUTION =======================================
     /**
      * @brief [Blocking] Execute plans simultaneously on both robots in the pair by specifying plan
@@ -345,6 +356,27 @@ public:
      * @warning Internal plans (not created by user) cannot be resumed due to safety concerns.
      */
     void PausePlan(std::pair<bool, bool> toggles);
+
+    /**
+     * @brief [Blocking] Stop one robot in the pair and transit its control mode to IDLE.
+     * @param[in] mask True: stop this robot; false: skip this robot.
+     * @throw std::runtime_error if failed to stop the robot.
+     * @note This function blocks until the robot comes to a complete stop.
+     */
+    /**
+     * @brief [Blocking] Stop the execution of the current plan for one robot in the pair.
+     * @param[in] mask True: stop plan for this robot; false: skip this robot.
+     * @throw std::logic_error if either robot is not in the correct control mode.
+     * @throw std::runtime_error if failed to deliver the request to the connected robot pair.
+     * @note Applicable control modes: NRT_PLAN_EXECUTION.
+     * @note This function blocks until the request is successfully delivered.
+     */
+    void StopPlan(std::pair<bool, bool> mask);
+
+    /**
+     * @overload Stop the execution of the current plan for both robots in the pair.
+     */
+    void StopPlan();
 
     /**
      * @brief [Blocking] Lists of all available plans from both robots in the pair.
@@ -452,23 +484,62 @@ public:
 
     //==================================== DIRECT JOINT CONTROL ====================================
     /**
-     * @brief [Non-blocking] Discretely send joint position, velocity, and acceleration command to
-     * both robots in the pair. The robot's internal motion generator will smoothen the discrete
-     * commands, which are tracked by either the joint impedance controller or the joint position
-     * controller, depending on the control mode.
+     * @brief [Non-blocking] Continuously stream joint torque commands to both robots in the pair.
+     * @param[in] torques Respective target joint torques: \f$ {\tau_J}_d \in \mathbb{R}^{n \times
+     * 1} \f$ for each robot. Unit: \f$ [Nm] \f$.
+     * @param[in] enable_gravity_comp Enable/disable robot gravity compensation for this robot.
+     * @param[in] enable_soft_limits Enable/disable soft limits for this robot to keep the joints
+     * from moving outside allowed position range, which will trigger a safety fault that requires
+     * recovery operation.
+     * @throw std::invalid_argument if size of any input vector does not match robot DoF.
+     * @throw std::logic_error if robot is not in the correct control mode.
+     * @throw std::runtime_error if number of timeliness failures has reached limit.
+     * @note Applicable control modes: RT_JOINT_TORQUE.
+     * @note Real-time (RT).
+     * @warning Always stream smooth and continuous commands to avoid sudden movements.
+     */
+    void StreamJointTorque(const std::pair<std::vector<double>, std::vector<double>>& torques,
+        std::pair<bool, bool> enable_gravity_comp = {true, true},
+        std::pair<bool, bool> enable_soft_limits = {true, true});
+
+    /**
+     * @brief [Non-blocking] Continuously stream joint position, velocity, and acceleration commands
+     * to both robots in the pair. The commands are tracked by either the joint impedance controller
+     * or the joint position controller, depending on the control mode.
+     * @param[in] positions Respective target joint positions: \f$ q_d \in \mathbb{R}^{n \times 1}
+     * \f$ for each robot. Unit: \f$ [rad] \f$.
+     * @param[in] velocities Respective target joint velocities: \f$ \dot{q}_d \in \mathbb{R}^{n
+     * \times 1} \f$ for each robot. Unit: \f$ [rad/s] \f$.
+     * @param[in] accelerations Respective target joint accelerations: \f$ \ddot{q}_d \in
+     * \mathbb{R}^{n \times 1} \f$ for each robot. Unit: \f$ [rad/s^2] \f$.
+     * @throw std::invalid_argument if size of any input vector does not match robot DoF.
+     * @throw std::logic_error if robot is not in the correct control mode.
+     * @throw std::runtime_error if number of timeliness failures has reached limit.
+     * @note Applicable control modes: RT_JOINT_IMPEDANCE, RT_JOINT_POSITION.
+     * @note Real-time (RT).
+     * @warning Always stream smooth and continuous commands to avoid sudden movements.
+     * @see SetJointImpedance().
+     */
+    void StreamJointPosition(const std::pair<std::vector<double>, std::vector<double>>& positions,
+        const std::pair<std::vector<double>, std::vector<double>>& velocities,
+        const std::pair<std::vector<double>, std::vector<double>>& accelerations);
+
+    /**
+     * @brief [Non-blocking] Discretely send joint position and velocity commands to both robots in
+     * the pair. The robot's internal motion generator will smoothen the discrete commands, which
+     * are tracked by either the joint impedance controller or the joint position controller,
+     * depending on the control mode.
      * @param[in] positions Respective target joint positions: \f$ q_d \in \mathbb{R}^{n \times 1}
      * \f$ for each robot. Unit: \f$ [rad] \f$.
      * @param[in] velocities Respective target joint velocities: \f$ \dot{q}_d \in \mathbb{R}^{n
      * \times 1} \f$ for each robot. Each joint will maintain this amount of velocity when it
      * reaches the target position. Unit: \f$ [rad/s] \f$.
-     * @param[in] accelerations Respective target joint accelerations: \f$ \ddot{q}_d \in
-     * \mathbb{R}^{n \times 1} \f$ for each robot. Each joint will maintain this amount of
-     * acceleration when it reaches the target position. Unit: \f$ [rad/s^2] \f$.
      * @param[in] max_vel Respective maximum joint velocities for the planned trajectory: \f$
      * \dot{q}_{max} \in \mathbb{R}^{n \times 1} \f$ for each robot. Unit: \f$ [rad/s] \f$.
      * @param[in] max_acc Respective maximum joint accelerations for the planned trajectory: \f$
      * \ddot{q}_{max} \in \mathbb{R}^{n \times 1} \f$ for each robot. Unit: \f$ [rad/s^2] \f$.
-     * @throw std::invalid_argument if size of any input vector does not match robot DoF.
+     * @throw std::invalid_argument if size of any input vector does not match robot DoF, or
+     * [max_vel] or [max_acc] contains any non-positive value.
      * @throw std::logic_error if either robot is not in the correct control mode.
      * @note Applicable control modes: NRT_JOINT_IMPEDANCE, NRT_JOINT_POSITION.
      * @warning Calling this function a second time while the motion from the previous call is still
@@ -478,7 +549,6 @@ public:
      */
     void SendJointPosition(const std::pair<std::vector<double>, std::vector<double>>& positions,
         const std::pair<std::vector<double>, std::vector<double>>& velocities,
-        const std::pair<std::vector<double>, std::vector<double>>& accelerations,
         const std::pair<std::vector<double>, std::vector<double>>& max_vel,
         const std::pair<std::vector<double>, std::vector<double>>& max_acc);
 
@@ -503,10 +573,100 @@ public:
     void SetJointImpedance(const std::pair<std::vector<double>, std::vector<double>>& K_q,
         const std::pair<std::vector<double>, std::vector<double>>& Z_q = {});
 
+    /**
+     * @brief [Blocking] For both robots in the pair, set maximum contact torques for the joint
+     * motion controller used in the joint impedance control modes. The controller will regulate its
+     * output to maintain contact torques with the environment under the set values.
+     * @param[in] max_torques Respective maximum contact torques: \f$ tau_q \in \mathbb{R}^{n \times
+     * 1} \f$ for each robot. Valid range: [0, RobotInfo::tau_max]. Unit: \f$ [Nm] \f$.
+     * @throw std::invalid_argument if [max_torques] contains any value outside the valid range or
+     * its size does not match robot DoF.
+     * @throw std::logic_error if either robot is not in the correct control mode.
+     * @throw std::runtime_error if failed to deliver the request to the connected robot pair.
+     * @note Applicable control modes: RT_JOINT_IMPEDANCE, NRT_JOINT_IMPEDANCE.
+     * @note This function blocks until the request is successfully delivered.
+     */
+    void SetMaxContactTorque(
+        const std::pair<std::vector<double>, std::vector<double>>& max_torques);
+
+    /**
+     * @brief [Blocking] For both robots in the pair, set inertia shaping scales for the joint
+     * motion controller used in the joint impedance control modes.
+     * @param[in] inertia_scales Respective inertia shaping scales: \f$ \sigma_q \in \mathbb{R}^{n
+     * \times 1} \f$ for each robot. Valid range: [0.75, 1.0]. The nominal (safe) value is 1.0,
+     * which means no shaping.
+     * @throw std::invalid_argument if [inertia_scales] contains any value outside the valid range
+     * or its size does not match robot DoF.
+     * @throw std::logic_error if robot is not in an applicable control mode.
+     * @throw std::runtime_error if failed to deliver the request to the connected robot pair.
+     * @note Applicable control modes: RT_JOINT_IMPEDANCE, NRT_JOINT_IMPEDANCE.
+     * @note This function blocks until the request is successfully delivered.
+     * @par Joint inertia shaping
+     * In joint impedance control modes, it is possible to shape down the natural inertia of the
+     * joints to make them behave as if they are lighter. The parameter [inertia_scales] sets the
+     * scale of shaped/natural inertia for each joint. Smaller scale corresponds to lighter inertia.
+     */
+    void SetJointInertiaScale(
+        const std::pair<std::vector<double>, std::vector<double>>& inertia_scales);
+
     //================================== DIRECT CARTESIAN CONTROL ==================================
     /**
-     * @brief [Non-blocking] Discretely send Cartesian motion and/or force command to both robots in
-     * the pair for them to track using its unified motion-force controller, which allows doing
+     * @brief [Non-blocking] Continuously stream Cartesian motion and/or force commands to both
+     * robots in the pair for them to track using its unified motion-force controller, which allows
+     * doing force control in zero or more Cartesian axes and motion control in the rest axes.
+     * @param[in] poses Respective target TCP poses in world frame: \f$ {^{O}T_{TCP}}_{d} \in
+     * \mathbb{R}^{7 \times 1} \f$ for each robot. Consists of \f$ \mathbb{R}^{3 \times 1} \f$
+     * position and \f$ \mathbb{R}^{4 \times 1} \f$ quaternion: \f$ [x, y, z, q_w, q_x, q_y, q_z]^T
+     * \f$. Unit: \f$ [m]:[] \f$.
+     * @param[in] wrenches Respective target TCP wrenches (force and moment) in the force control
+     * reference frame (configured by SetForceControlFrame()): \f$ ^{0}F_d \in \mathbb{R}^{6 \times
+     * 1} \f$ for each robot. The robot will track the target wrench using an explicit force
+     * controller. Consists of \f$ \mathbb{R}^{3 \times 1} \f$ force and \f$ \mathbb{R}^{3 \times 1}
+     * \f$ moment: \f$ [f_x, f_y, f_z, m_x, m_y, m_z]^T \f$. Unit: \f$ [N]:[Nm] \f$.
+     * @param[in] c Respective target TCP velocities (linear and angular) in world frame: \f$
+     * ^{0}\dot{x}_d \in \mathbb{R}^{6 \times 1} \f$ for each robot. Providing properly calculated
+     * target velocity can improve the robot's overall tracking performance at the cost of reduced
+     * robustness. Leaving this input 0 can maximize robustness at the cost of reduced tracking
+     * performance. Consists of \f$ \mathbb{R}^{3 \times 1} \f$ linear and \f$ \mathbb{R}^{3 \times
+     * 1} \f$ angular velocity. Unit: \f$ [m/s]:[rad/s] \f$.
+     * @param[in] accelerations Respective target TCP accelerations (linear and angular) in world
+     * frame: \f$ ^{0}\ddot{x}_d \in \mathbb{R}^{6 \times 1} \f$ for each robot. Feeding forward
+     * target acceleration can improve the robot's tracking performance for highly dynamic motions,
+     * but it's also okay to leave this input 0. Consists of \f$ \mathbb{R}^{3 \times 1} \f$ linear
+     * and \f$ \mathbb{R}^{3 \times 1} \f$ angular acceleration. Unit: \f$ [m/s^2]:[rad/s^2] \f$.
+     * @throw std::logic_error if robot is not in the correct control mode.
+     * @throw std::runtime_error if number of timeliness failures has reached limit.
+     * @note Applicable control modes: RT_CARTESIAN_MOTION_FORCE.
+     * @note Real-time (RT).
+     * @warning Always stream smooth and continuous motion commands to avoid sudden movements. The
+     * force commands don't need to be continuous.
+     * @warning Same as Flexiv Elements, the target wrench is expressed as wrench sensed at TCP
+     * instead of wrench exerted by TCP. E.g. commanding f_z = +5 N will make the end-effector move
+     * towards -Z direction, so that upon contact, the sensed force will be +5 N.
+     * @par How to achieve pure motion control?
+     * Use SetForceControlAxis() to disable force control for all Cartesian axes to achieve pure
+     * motion control. This function does pure motion control by default.
+     * @par How to achieve pure force control?
+     * Use SetForceControlAxis() to enable force control for all Cartesian axes to achieve pure
+     * force control, active or passive.
+     * @par How to achieve unified motion-force control?
+     * Use SetForceControlAxis() to enable force control for one or more Cartesian axes and leave
+     * the rest axes motion-controlled, then provide target pose for the motion-controlled axes and
+     * target wrench for the force-controlled axes.
+     * @see SetCartesianImpedance(), SetMaxContactWrench(), SetNullSpacePosture(),
+     * SetForceControlAxis(), SetForceControlFrame(), SetPassiveForceControl().
+     */
+    void StreamCartesianMotionForce(
+        const std::pair<std::array<double, kPoseSize>, std::array<double, kPoseSize>>& poses,
+        const std::pair<std::array<double, kCartDoF>, std::array<double, kCartDoF>>& wrenches = {},
+        const std::pair<std::array<double, kCartDoF>, std::array<double, kCartDoF>>& velocities
+        = {},
+        const std::pair<std::array<double, kCartDoF>, std::array<double, kCartDoF>>& accelerations
+        = {});
+
+    /**
+     * @brief [Non-blocking] Discretely send Cartesian motion and/or force commands to both robots
+     * in the pair for them to track using its unified motion-force controller, which allows doing
      * force control in zero or more Cartesian axes and motion control in the rest axes. The robot's
      * internal motion generator will smoothen the discrete commands.
      * @param[in] poses Respective target TCP poses in world frame: \f$ {^{O}T_{TCP}}_{d} \in
@@ -518,6 +678,13 @@ public:
      * 1} \f$ for each robot. The robot will track the target wrench using an explicit force
      * controller. Consists of \f$ \mathbb{R}^{3 \times 1} \f$ force and \f$ \mathbb{R}^{3 \times 1}
      * \f$ moment: \f$ [f_x, f_y, f_z, m_x, m_y, m_z]^T \f$. Unit: \f$ [N]:[Nm] \f$.
+     * @param[in] velocities Respective target TCP velocities (linear and angular) in world frame
+     * when reaching the target poses specified above: \f$ ^{0}\dot{x}_d \in \mathbb{R}^{6 \times 1}
+     * \f$ for each robot. Providing properly calculated target velocity can improve the robot's
+     * overall tracking performance at the cost of reduced robustness. Leaving this input 0 can
+     * maximize robustness at the cost of reduced tracking performance. Consists of \f$
+     * \mathbb{R}^{3 \times 1} \f$ linear and \f$ \mathbb{R}^{3 \times 1} \f$ angular velocity.
+     * Unit: \f$ [m/s]:[rad/s] \f$.
      * @param[in] max_linear_vel Respective maximum Cartesian linear velocities when moving to the
      * target poses. A safe value is provided as default. Unit: \f$ [m/s] \f$.
      * @param[in] max_angular_vel Respective maximum Cartesian angular velocities when moving to the
@@ -548,6 +715,8 @@ public:
     void SendCartesianMotionForce(
         const std::pair<std::array<double, kPoseSize>, std::array<double, kPoseSize>>& poses,
         const std::pair<std::array<double, kCartDoF>, std::array<double, kCartDoF>>& wrenches = {},
+        const std::pair<std::array<double, kCartDoF>, std::array<double, kCartDoF>>& velocities
+        = {},
         std::pair<double, double> max_linear_vel = {0.5, 0.5},
         std::pair<double, double> max_angular_vel = {1.0, 1.0},
         std::pair<double, double> max_linear_acc = {2.0, 2.0},
@@ -771,6 +940,7 @@ private:
 
     friend class GripperPair;
     friend class BimanualPrimitives;
+    friend class SelfCollisionMonitor;
 };
 
 } /* namespace drdk */

@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
         "with a pair of robots and print received robot states.\n");
 
     try {
-        // RDK Initialization
+        // DRDK Initialization
         // =========================================================================================
         // Instantiate robot pair interface
         drdk::RobotPair robot_pair({left_robot_sn, right_robot_sn});

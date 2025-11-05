@@ -3,18 +3,15 @@ set -e
 echo "Installing flexiv_rdk"
 
 # Use a specific version
-GIT_TAG=v1.7
-
-# Get install directory and number of parallel build jobs as script arguments
-INSTALL_DIR=$1
-NUM_JOBS=$2
+VER_TAG=v1.8
 
 # Clone source code with only 1 layer of history
 if [ ! -d flexiv_rdk ] ; then
-  git clone https://github.com/flexivrobotics/flexiv_rdk.git --depth 1 --branch $GIT_TAG
+  git clone https://github.com/flexivrobotics/flexiv_rdk.git --depth 1 --branch $VER_TAG
   cd flexiv_rdk
 else
   cd flexiv_rdk
+  git checkout $VER_TAG
 fi
 
 # Save path to flexiv_rdk root

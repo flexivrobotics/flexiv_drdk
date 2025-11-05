@@ -199,3 +199,11 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+   APPENDIX: This software depends on the following third-party libraries, and users must comply to their licenses.
+      - assimp: https://github.com/assimp/assimp/blob/master/LICENSE
+      - boost: https://github.com/boostorg/boost/blob/master/LICENSE_1_0.txt
+      - coal: https://github.com/coal-library/coal/blob/devel/LICENSE
+      - console_bridge: https://github.com/ros/console_bridge/blob/master/LICENSE
+      - flexiv_rdk: https://github.com/flexivrobotics/flexiv_rdk/blob/main/LICENSE
+      - urdfdom: https://github.com/ros/urdfdom/blob/rolling/LICENSE
