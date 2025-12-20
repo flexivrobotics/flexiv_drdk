@@ -91,6 +91,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
   flexiv::flexiv_rdk
   coal::coal
   urdfdom::urdf_parser
+  assimp::assimp
 )
 
 # Use moderate compiler warning option
