@@ -3,7 +3,7 @@ set -e
 echo "Installing flexiv_rdk"
 
 # Use a specific version
-VER_TAG=v1.8
+VER_TAG=release/v1.9
 
 # Clone source code with only 1 layer of history
 if [ ! -d flexiv_rdk ] ; then
