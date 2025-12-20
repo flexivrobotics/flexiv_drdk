@@ -23,10 +23,12 @@ public:
      * @brief [Non-blocking] Instantiate the self collision monitor.
      * @param[in] robot_pair Reference to the instance of flexiv::drdk::RobotPair.
      * @param[in] urdf_paths Paths to the URDF of the left and right robot respectively.
+     * @param[in] skipped_links Name of the link(s) to skip for collision check.
      * @throw std::runtime_error if the initialization sequence failed.
      */
-    SelfCollisionMonitor(
-        const RobotPair& robot_pair, const std::pair<std::string, std::string>& urdf_paths);
+    SelfCollisionMonitor(const RobotPair& robot_pair,
+        const std::pair<std::string, std::string>& urdf_paths,
+        const std::vector<std::string>& skipped_links = {});
     virtual ~SelfCollisionMonitor();
 
     /**
