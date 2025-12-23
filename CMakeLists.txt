@@ -55,21 +55,9 @@ message(STATUS "Found flexiv_rdk v${flexiv_rdk_VERSION}: ${flexiv_rdk_DIR}")
 find_package(coal REQUIRED)
 message(STATUS "Found coal v${coal_VERSION}: ${coal_DIR}")
 
-# urdfdom
-find_package(urdfdom REQUIRED)
-message(STATUS "Found urdfdom v${urdfdom_VERSION}: ${urdfdom_DIR}")
-
 # assimp: dependency of coal but coal didn't handle it well so we need to find it for coal
 find_package(assimp REQUIRED)
 message(STATUS "Found assimp v${assimp_VERSION}: ${assimp_DIR}")
-
-# console_bridge: dependency of urdfdom, needs to be explicitly found
-find_package(console_bridge REQUIRED)
-message(STATUS "Found console_bridge v${console_bridge_VERSION}: ${console_bridge_DIR}")
-
-# tinyxml2: dependency of urdfdom, needs to be explicitly found
-find_package(tinyxml2 REQUIRED)
-message(STATUS "Found tinyxml2 v${tinyxml2_VERSION}: ${tinyxml2_DIR}")
 
 # ===================================================================
 #      CREATE LIBRARY
@@ -90,7 +78,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} PUBLIC
   flexiv::flexiv_rdk
   coal::coal
-  urdfdom::urdf_parser
   assimp::assimp
 )
 
