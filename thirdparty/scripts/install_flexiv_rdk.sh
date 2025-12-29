@@ -17,9 +17,19 @@ fi
 # Save path to flexiv_rdk root
 ROOT_DIR=$(pwd)
 
+# Dependency installation script to run based on script argument
+DEP_SCRIPT=build_and_install_dependencies
+for arg in "$@"; do
+  case "$arg" in
+    --skip-ros2)
+      DEP_SCRIPT=build_and_install_dependencies_not_in_ros2
+      ;;
+  esac
+done
+
 # Build and install nested dependencies
 cd thirdparty
-bash build_and_install_dependencies.sh $INSTALL_DIR $NUM_JOBS
+bash $DEP_SCRIPT.sh $INSTALL_DIR $NUM_JOBS
 
 # Configure CMake
 cd $ROOT_DIR
