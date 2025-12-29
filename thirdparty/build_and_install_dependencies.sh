@@ -11,8 +11,9 @@ if [ "$#" -lt 1 ]; then
     echo "Error: invalid script argument"
     echo "Required argument: [install_directory_path]"
     echo "    install_directory_path: directory to install all dependencies, should be the same as the install directory of flexiv_drdk"
-    echo "Optional argument: [num_parallel_jobs]"
+    echo "Optional argument: [num_parallel_jobs] [--skip-rdk]"
     echo "    num_parallel_jobs: number of parallel jobs used to build, use 4 if not specified"
+    echo "    --skip-rdk: skip building and install flexiv_rdk"
     exit
 fi
 
@@ -49,8 +50,22 @@ export OS_NAME
 # Clone all dependencies in a subfolder
 mkdir -p cloned && cd cloned
 
+# Dependency installation script to run based on script argument
+SKIP_RDK=false
+for arg in "$@"; do
+  case "$arg" in
+    --skip-rdk)
+      SKIP_RDK=true
+      ;;
+  esac
+done
+
 # Build and install all dependencies to INSTALL_DIR
-bash $SCRIPTPATH/scripts/install_flexiv_rdk.sh
+if $SKIP_RDK; then
+    echo "SKipping flexiv_rdk"
+else
+    bash $SCRIPTPATH/scripts/install_flexiv_rdk.sh
+fi
 bash $SCRIPTPATH/scripts/install_boost.sh
 bash $SCRIPTPATH/scripts/install_assimp.sh
 bash $SCRIPTPATH/scripts/install_coal.sh
