@@ -1,5 +1,6 @@
 #!/bin/sh
-# This script builds from source and installs all dependencies of flexiv_drdk.
+# Build and install all dependencies of flexiv_drdk.
+echo ">>>>> Start: flexiv_drdk/thirdparty/build_and_install_dependencies.sh <<<<<"
 
 # Absolute path of this script
 export SCRIPTPATH="$(dirname $(readlink -f $0))"
@@ -44,4 +45,4 @@ bash $SCRIPTPATH/scripts/install_boost.sh
 bash $SCRIPTPATH/scripts/install_assimp.sh
 bash $SCRIPTPATH/scripts/install_coal.sh
 
-echo ">>>>>>>>>> Finished <<<<<<<<<<"
+echo ">>>>> Finished: flexiv_drdk/thirdparty/build_and_install_dependencies.sh <<<<<"
