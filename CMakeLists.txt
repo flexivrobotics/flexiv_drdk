@@ -26,6 +26,16 @@ else()
     message(FATAL_ERROR "${CMAKE_SYSTEM_NAME} is currently not supported.")
 endif()
 
+# Option to support ROS2 Jazzy
+option(DRDK_SUPPORT_ROS2_JAZZY "Use DRDK library compatible with ROS2 Jazzy" OFF)
+if(DRDK_SUPPORT_ROS2_JAZZY)
+  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND ${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
+    set(RDK_LIB "libflexiv_drdk.x86_64-linux-gnu.ros2-jazzy.a")
+  else()
+    message(FATAL_ERROR "ROS2 Jazzy compatibility is currently only supported on x86_64 Linux")
+  endif()
+endif()
+
 # Parse expected hash of the library file
 file(READ ${CMAKE_CURRENT_SOURCE_DIR}/lib/${DRDK_LIB}.sha256 EXPECTED_HASH)
 
