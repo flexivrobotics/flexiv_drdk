@@ -3,11 +3,11 @@ set -e
 echo "Installing flexiv_rdk"
 
 # Use a specific version
-VER_TAG=release/v1.9
+VER_TAG=v1.9
 
 # Clone source code with only 1 layer of history
 if [ ! -d flexiv_rdk ] ; then
-  git clone https://github.com/flexivrobotics/flexiv_rdk.git --depth 1 --branch $VER_TAG
+  git clone https://github.com/flexivrobotics/flexiv_rdk.git --branch $VER_TAG
   cd flexiv_rdk
 else
   cd flexiv_rdk
