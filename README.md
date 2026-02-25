@@ -72,7 +72,7 @@ The following steps are identical on all supported platforms.
 
        cd flexiv_drdk
        mkdir build && cd build
-       cmake .. -DCMAKE_INSTALL_PREFIX=~/drdk_install
+       cmake .. -DCMAKE_INSTALL_PREFIX=~/drdk_install -DCMAKE_PREFIX_PATH=~/drdk_install
 
    NOTE: ``-D`` followed by ``CMAKE_INSTALL_PREFIX`` sets the absolute path of the installation directory, which should be the one chosen in step 1.
 
