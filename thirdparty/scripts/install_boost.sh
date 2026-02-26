@@ -27,6 +27,6 @@ fi
 
 # Build and install
 ./bootstrap.sh
-./b2 -j4 --prefix=$INSTALL_DIR --with-serialization --with-filesystem variant=release link=static install
+./b2 -j4 --prefix=$INSTALL_DIR --with-serialization --with-filesystem variant=release link=shared install
 
 echo "Installed boost"

@@ -1,5 +1,6 @@
 #!/bin/sh
-# This script builds from source and installs all dependencies of flexiv_drdk.
+# Build and install all dependencies of flexiv_drdk.
+echo ">>>>> Start: flexiv_drdk/thirdparty/build_and_install_dependencies.sh <<<<<"
 
 # Absolute path of this script
 export SCRIPTPATH="$(dirname $(readlink -f $0))"
@@ -10,8 +11,9 @@ if [ "$#" -lt 1 ]; then
     echo "Error: invalid script argument"
     echo "Required argument: [install_directory_path]"
     echo "    install_directory_path: directory to install all dependencies, should be the same as the install directory of flexiv_drdk"
-    echo "Optional argument: [num_parallel_jobs]"
+    echo "Optional argument: [num_parallel_jobs] [--skip-rdk]"
     echo "    num_parallel_jobs: number of parallel jobs used to build, use 4 if not specified"
+    echo "    --skip-rdk: skip building and install flexiv_rdk"
     exit
 fi
 
@@ -29,22 +31,43 @@ echo "Number of parallel build jobs: $NUM_JOBS"
 
 # Set shared cmake arguments
 export SHARED_CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release \
-                          -DBUILD_SHARED_LIBS=OFF \
+                          -DBUILD_SHARED_LIBS=ON \
                           -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
                           -DCMAKE_PREFIX_PATH=$INSTALL_DIR \
                           -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
                           -DBUILD_TESTING=OFF"
 
+# OS type
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    OS_NAME="Linux"
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    OS_NAME="Darwin"
+else
+    OS_NAME="Windows"
+fi
+export OS_NAME
+
 # Clone all dependencies in a subfolder
 mkdir -p cloned && cd cloned
 
+# Dependency installation script to run based on script argument
+SKIP_RDK=false
+for arg in "$@"; do
+  case "$arg" in
+    --skip-rdk)
+      SKIP_RDK=true
+      ;;
+  esac
+done
+
 # Build and install all dependencies to INSTALL_DIR
-bash $SCRIPTPATH/scripts/install_flexiv_rdk.sh
+if $SKIP_RDK; then
+    echo "SKipping flexiv_rdk"
+else
+    bash $SCRIPTPATH/scripts/install_flexiv_rdk.sh
+fi
 bash $SCRIPTPATH/scripts/install_boost.sh
 bash $SCRIPTPATH/scripts/install_assimp.sh
 bash $SCRIPTPATH/scripts/install_coal.sh
-bash $SCRIPTPATH/scripts/install_console_bridge.sh
-bash $SCRIPTPATH/scripts/install_urdfdom_headers.sh
-bash $SCRIPTPATH/scripts/install_urdfdom.sh
 
-echo ">>>>>>>>>> Finished <<<<<<<<<<"
+echo ">>>>> Finished: flexiv_drdk/thirdparty/build_and_install_dependencies.sh <<<<<"

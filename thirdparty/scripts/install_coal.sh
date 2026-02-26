@@ -9,19 +9,12 @@ VER_TAG=v3.0.2
 
 # Clone source code
 if [ ! -d $REPO ] ; then
-  git clone https://github.com/coal-library/$REPO.git --branch $VER_TAG
+  git clone --recurse-submodules https://github.com/coal-library/$REPO.git --branch $VER_TAG
   cd $REPO
 else
   cd $REPO
   git checkout $VER_TAG
 fi
-
-# Initialize submodules
-git submodule update --init --recursive
-
-# Apply patch to remove forced building shared library
-git reset --hard
-git apply $SCRIPTPATH/patches/$REPO.patch
 
 # Configure CMake
 mkdir -p build && cd build

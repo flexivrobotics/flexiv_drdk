@@ -3,11 +3,11 @@ set -e
 echo "Installing flexiv_rdk"
 
 # Use a specific version
-VER_TAG=v1.8
+VER_TAG=v1.9
 
 # Clone source code with only 1 layer of history
 if [ ! -d flexiv_rdk ] ; then
-  git clone https://github.com/flexivrobotics/flexiv_rdk.git --depth 1 --branch $VER_TAG
+  git clone https://github.com/flexivrobotics/flexiv_rdk.git --branch $VER_TAG
   cd flexiv_rdk
 else
   cd flexiv_rdk
@@ -25,6 +25,7 @@ bash build_and_install_dependencies.sh $INSTALL_DIR $NUM_JOBS
 cd $ROOT_DIR
 mkdir -p build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release \
+         -DCMAKE_PREFIX_PATH=$INSTALL_DIR \
          -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
 
 # Build and install

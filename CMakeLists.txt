@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.22.0)
 # ===================================================================
 #      PROJECT SETUP
 # ===================================================================
-project(flexiv_drdk VERSION 1.1.0)
+project(flexiv_drdk VERSION 1.2.0)
 
 # Configure build type
 if(NOT CMAKE_BUILD_TYPE)
@@ -26,11 +26,28 @@ else()
     message(FATAL_ERROR "${CMAKE_SYSTEM_NAME} is currently not supported.")
 endif()
 
+# Option to support ROS2 Jazzy
+option(DRDK_SUPPORT_ROS2_JAZZY "Use DRDK library compatible with ROS2 Jazzy" OFF)
+if(DRDK_SUPPORT_ROS2_JAZZY)
+  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
+      set(DRDK_LIB "libflexiv_drdk.x86_64-linux-gnu.ros2-jazzy.a")
+    elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
+      set(DRDK_LIB "libflexiv_drdk.aarch64-linux-gnu.ros2-jazzy.a")
+    else()
+      message(FATAL_ERROR 
+        "Compatibility with ROS2 Jazzy is currently not supported on Linux with ${CMAKE_SYSTEM_PROCESSOR} processor.")
+    endif()
+  else()
+    message(FATAL_ERROR "Compatibility with ROS2 Jazzy is currently not supported on ${CMAKE_SYSTEM_NAME}.")
+  endif()
+endif()
+
 # Parse expected hash of the library file
 file(READ ${CMAKE_CURRENT_SOURCE_DIR}/lib/${DRDK_LIB}.sha256 EXPECTED_HASH)
 
 # Download the library file from GitHub 
-set(DRDK_LIB_URL https://github.com/flexivrobotics/flexiv_drdk/releases/download/v1.1/${DRDK_LIB})
+set(DRDK_LIB_URL https://github.com/flexivrobotics/flexiv_drdk/releases/download/v1.2/${DRDK_LIB})
 message(STATUS "Downloading ${DRDK_LIB_URL} ...")
 file(DOWNLOAD ${DRDK_LIB_URL} ${CMAKE_CURRENT_BINARY_DIR}/${DRDK_LIB}
      SHOW_PROGRESS
@@ -55,21 +72,9 @@ message(STATUS "Found flexiv_rdk v${flexiv_rdk_VERSION}: ${flexiv_rdk_DIR}")
 find_package(coal REQUIRED)
 message(STATUS "Found coal v${coal_VERSION}: ${coal_DIR}")
 
-# urdfdom
-find_package(urdfdom REQUIRED)
-message(STATUS "Found urdfdom v${urdfdom_VERSION}: ${urdfdom_DIR}")
-
 # assimp: dependency of coal but coal didn't handle it well so we need to find it for coal
 find_package(assimp REQUIRED)
 message(STATUS "Found assimp v${assimp_VERSION}: ${assimp_DIR}")
-
-# console_bridge: dependency of urdfdom, needs to be explicitly found
-find_package(console_bridge REQUIRED)
-message(STATUS "Found console_bridge v${console_bridge_VERSION}: ${console_bridge_DIR}")
-
-# tinyxml2: dependency of urdfdom, needs to be explicitly found
-find_package(tinyxml2 REQUIRED)
-message(STATUS "Found tinyxml2 v${tinyxml2_VERSION}: ${tinyxml2_DIR}")
 
 # ===================================================================
 #      CREATE LIBRARY
@@ -90,7 +95,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} PUBLIC
   flexiv::flexiv_rdk
   coal::coal
-  urdfdom::urdf_parser
+  assimp::assimp
 )
 
 # Use moderate compiler warning option

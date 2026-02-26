@@ -72,7 +72,7 @@ The following steps are identical on all supported platforms.
 
        cd flexiv_drdk
        mkdir build && cd build
-       cmake .. -DCMAKE_INSTALL_PREFIX=~/drdk_install
+       cmake .. -DCMAKE_INSTALL_PREFIX=~/drdk_install -DCMAKE_PREFIX_PATH=~/drdk_install
 
    NOTE: ``-D`` followed by ``CMAKE_INSTALL_PREFIX`` sets the absolute path of the installation directory, which should be the one chosen in step 1.
 
@@ -97,11 +97,11 @@ NOTE: ``-D`` followed by ``CMAKE_PREFIX_PATH`` tells the user project's CMake wh
 To run an example C++ program compiled during the previous step:
 
     cd flexiv_drdk/example/build
-    ./<example_name> [left_robot_sn] [right_robot_sn]
+    LD_LIBRARY_PATH=~/drdk_install/lib ./<example_name> [left_robot_sn] [right_robot_sn]
 
 For example:
 
-    ./basics1_display_robot_states Rizon4-100001 Rizon4-100002
+    LD_LIBRARY_PATH=~/drdk_install/lib ./basics1_display_robot_states Rizon4-100001 Rizon4-100002
 
 ## API Documentation
 
