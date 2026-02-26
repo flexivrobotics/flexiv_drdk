@@ -97,11 +97,11 @@ NOTE: ``-D`` followed by ``CMAKE_PREFIX_PATH`` tells the user project's CMake wh
 To run an example C++ program compiled during the previous step:
 
     cd flexiv_drdk/example/build
-    ./<example_name> [left_robot_sn] [right_robot_sn]
+    LD_LIBRARY_PATH=~/drdk_install/lib ./<example_name> [left_robot_sn] [right_robot_sn]
 
 For example:
 
-    ./basics1_display_robot_states Rizon4-100001 Rizon4-100002
+    LD_LIBRARY_PATH=~/drdk_install/lib ./basics1_display_robot_states Rizon4-100001 Rizon4-100002
 
 ## API Documentation
 
