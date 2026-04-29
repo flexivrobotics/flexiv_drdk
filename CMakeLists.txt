@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 3.22.0)
+cmake_minimum_required(VERSION 3.22.1)
 
 # ===================================================================
 #      PROJECT SETUP
 # ===================================================================
-project(flexiv_drdk VERSION 1.2.0)
+project(flexiv_drdk VERSION 1.2.1)
 
 # Configure build type
 if(NOT CMAKE_BUILD_TYPE)
@@ -47,7 +47,7 @@ endif()
 file(READ ${CMAKE_CURRENT_SOURCE_DIR}/lib/${DRDK_LIB}.sha256 EXPECTED_HASH)
 
 # Download the library file from GitHub 
-set(DRDK_LIB_URL https://github.com/flexivrobotics/flexiv_drdk/releases/download/v1.2/${DRDK_LIB})
+set(DRDK_LIB_URL https://github.com/flexivrobotics/flexiv_drdk/releases/download/v${PROJECT_VERSION}/${DRDK_LIB})
 message(STATUS "Downloading ${DRDK_LIB_URL} ...")
 file(DOWNLOAD ${DRDK_LIB_URL} ${CMAKE_CURRENT_BINARY_DIR}/${DRDK_LIB}
      SHOW_PROGRESS
