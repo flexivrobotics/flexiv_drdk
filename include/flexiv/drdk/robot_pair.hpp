@@ -491,7 +491,12 @@ public:
      * @param[in] enable_soft_limits Enable/disable soft limits for this robot to keep the joints
      * from moving outside allowed position range, which will trigger a safety fault that requires
      * recovery operation.
-     * @throw std::invalid_argument if size of any input vector does not match robot DoF.
+     * @param[in] friction_comp_scale Percentage of joint friction to be compensated for this robot.
+     * Valid range: [0, 100]. Setting to 100 means to compensate all joint friction, and 0 means no
+     * friction compensation at all. Under-compensation increases natural damping of the joints,
+     * which can be useful in some cases, e.g. zero-torque floating.
+     * @throw std::invalid_argument if size of any input vector does not match robot DoF, or
+     * [friction_comp_scale] is outside the valid range.
      * @throw std::logic_error if robot is not in the correct control mode.
      * @throw std::runtime_error if number of timeliness failures has reached limit.
      * @note Applicable control modes: RT_JOINT_TORQUE.
@@ -500,7 +505,8 @@ public:
      */
     void StreamJointTorque(const std::pair<std::vector<double>, std::vector<double>>& torques,
         std::pair<bool, bool> enable_gravity_comp = {true, true},
-        std::pair<bool, bool> enable_soft_limits = {true, true});
+        std::pair<bool, bool> enable_soft_limits = {true, true},
+        std::pair<double, double> friction_comp_scale = {100.0, 100.0});
 
     /**
      * @brief [Non-blocking] Continuously stream joint position, velocity, and acceleration commands
