@@ -74,6 +74,14 @@ public:
     std::pair<RobotStates, RobotStates> states() const;
 
     /**
+     * @brief [Non-blocking] Current actions data of both robots in the pair.
+     * @return Respective value copies of rdk::RobotActions struct.
+     * @note The desired TCP poses are expressed in the shared world frame instead of the robots'
+     * respective base frames.
+     */
+    std::pair<RobotActions, RobotActions> actions() const;
+
+    /**
      * @brief [Non-blocking] Whether both robots in the pair have come to a complete stop.
      * @return True: both stopped; false: one or both are still moving.
      */
