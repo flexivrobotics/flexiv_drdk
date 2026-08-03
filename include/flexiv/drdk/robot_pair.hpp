@@ -74,6 +74,14 @@ public:
     std::pair<RobotStates, RobotStates> states() const;
 
     /**
+     * @brief [Non-blocking] Current actions data of both robots in the pair.
+     * @return Respective value copies of rdk::RobotActions struct.
+     * @note The desired TCP poses are expressed in the shared world frame instead of the robots'
+     * respective base frames.
+     */
+    std::pair<RobotActions, RobotActions> actions() const;
+
+    /**
      * @brief [Non-blocking] Whether both robots in the pair have come to a complete stop.
      * @return True: both stopped; false: one or both are still moving.
      */
@@ -727,6 +735,46 @@ public:
         std::pair<double, double> max_angular_vel = {1.0, 1.0},
         std::pair<double, double> max_linear_acc = {2.0, 2.0},
         std::pair<double, double> max_angular_acc = {5.0, 5.0});
+
+    /**
+     * @brief [Non-blocking] Discretely send Cartesian multi-waypoint motion and/or force commands
+     * to both robots in the pair for them to track using non-real-time super primitives. Each robot
+     * will execute its provided waypoints sequentially using onboard motion generation.
+     * @param[in] cart_cmds Respective non-real-time Cartesian motion/force commands for each
+     * waypoint of each robot. Each element uses the same data layout as a single command in
+     * SendCartesianMotionForce(), with the target pose expressed in the shared world frame.
+     * @param[in] joint_pos Respective sequences of target joint positions [rad] for each waypoint of
+     * each robot. Each element must contain RobotInfo::DoF values, i.e. the full system degrees of
+     * freedom including the manipulator and any external axes. Size must match the corresponding
+     * [cart_cmds].
+     * @throw std::invalid_argument if either robot's [cart_cmds] is empty, if either robot's
+     * [joint_pos] is empty, if [cart_cmds] and [joint_pos] of either robot do not contain the same
+     * number of waypoints, if any waypoint's last 4 input parameters is not positive, or if any
+     * joint position vector size is not equal to RobotInfo::DoF.
+     * @throw std::logic_error if either robot is not in the correct control mode.
+     * @throw std::runtime_error if either robot is not operational.
+     * @note Applicable control modes: NRT_SUPER_PRIMITIVE.
+     * @warning Same as Flexiv Elements, the target wrench is expressed as wrench sensed at TCP
+     * instead of wrench exerted by TCP. E.g. commanding f_z = +5 N will make the end-effector move
+     * towards -Z direction, so that upon contact, the sensed force will be +5 N.
+     * @par How to achieve pure motion control?
+     * Use SetForceControlAxis() to disable force control for all Cartesian axes to achieve pure
+     * motion control. This function does pure motion control by default.
+     * @par How to achieve pure force control?
+     * Use SetForceControlAxis() to enable force control for all Cartesian axes to achieve pure
+     * force control, active or passive.
+     * @par How to achieve unified motion-force control?
+     * Use SetForceControlAxis() to enable force control for one or more Cartesian axes and leave
+     * the rest axes motion-controlled, then provide target pose for the motion-controlled axes and
+     * target wrench for the force-controlled axes.
+     * @see SetCartesianImpedance(), SetMaxContactWrench(), SetNullSpacePosture(),
+     * SetForceControlAxis(), SetForceControlFrame(), SetPassiveForceControl(),
+     * SendCartesianMotionForce().
+     */
+    void SendMultiCartesianMotionForce(
+        const std::pair<std::vector<NrtCartesianCmd>, std::vector<NrtCartesianCmd>>& cart_cmds,
+        const std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>&
+            joint_pos);
 
     /**
      * @brief [Blocking] For both robots in the pair, set impedance properties of the Cartesian
