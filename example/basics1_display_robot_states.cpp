@@ -8,7 +8,6 @@
 
 #include <flexiv/drdk/robot_pair.hpp>
 #include <flexiv/rdk/utility.hpp>
-#include <spdlog/spdlog.h>
 
 #include <iostream>
 #include <thread>
@@ -32,15 +31,15 @@ void PrintRobotStates(drdk::RobotPair& robot_pair)
 {
     while (true) {
         // Print all robot states in JSON format using the built-in ostream operator overloading
-        spdlog::info("Left robot states:");
+        std::cout << "Left robot states:" << std::endl;
         std::cout << robot_pair.states().first << std::endl;
-        spdlog::info("Right robot states:");
+        std::cout << "Right robot states:" << std::endl;
         std::cout << robot_pair.states().second << std::endl;
 
         // Print digital inputs
-        spdlog::info("Left robot digital inputs:");
+        std::cout << "Left robot digital inputs:" << std::endl;
         std::cout << rdk::utility::Arr2Str(robot_pair.digital_inputs().first) << std::endl;
-        spdlog::info("Right robot digital inputs:");
+        std::cout << "Right robot digital inputs:" << std::endl;
         std::cout << rdk::utility::Arr2Str(robot_pair.digital_inputs().second) << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
@@ -61,9 +60,9 @@ int main(int argc, char* argv[])
     std::string right_robot_sn = argv[2];
 
     // Print description
-    spdlog::info(
-        ">>> Tutorial description <<<\nThis tutorial does the very first thing: check connection "
-        "with a pair of robots and print received robot states.\n");
+    std::cout << ">>> Tutorial description <<<\nThis tutorial does the very first thing: check "
+                 "connection with a pair of robots and print received robot states.\n"
+              << std::endl;
 
     try {
         // DRDK Initialization
@@ -73,26 +72,27 @@ int main(int argc, char* argv[])
 
         // Clear fault on the connected robots if any
         if (robot_pair.fault()) {
-            spdlog::warn("Fault occurred on one of the connected robots, trying to clear ...");
+            std::cerr << "[warn] Fault occurred on one of the connected robots, trying to clear ..."
+                      << std::endl;
             // Try to clear the fault for both robots
             auto result = robot_pair.ClearFault();
             // If fault is not cleared on both robots
             if (!(result.first && result.second)) {
-                spdlog::error("Fault cannot be cleared, exiting ...");
+                std::cerr << "[error] Fault cannot be cleared, exiting ..." << std::endl;
                 return 1;
             }
-            spdlog::info("Fault on the connected robot is cleared");
+            std::cout << "Fault on the connected robot is cleared" << std::endl;
         }
 
         // Enable the pair of robots, make sure the E-stop is released before enabling
-        spdlog::info("Enabling robots ...");
+        std::cout << "Enabling robots ..." << std::endl;
         robot_pair.Enable();
 
         // Wait for both robots to become operational
         while (!robot_pair.operational()) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
-        spdlog::info("Both robots are now operational");
+        std::cout << "Both robots are now operational" << std::endl;
 
         // Print States
         // =========================================================================================
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
         // Properly exit thread
         low_priority_thread.join();
     } catch (const std::exception& e) {
-        spdlog::error(e.what());
+        std::cerr << "[error] " << e.what() << std::endl;
         return 1;
     }
 

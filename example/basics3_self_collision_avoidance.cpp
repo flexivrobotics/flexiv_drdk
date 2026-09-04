@@ -9,7 +9,6 @@
 #include <flexiv/drdk/robot_pair.hpp>
 #include <flexiv/drdk/self_collision_monitor.hpp>
 #include <flexiv/rdk/utility.hpp>
-#include <spdlog/spdlog.h>
 
 #include <iostream>
 #include <string>
@@ -50,9 +49,9 @@ int main(int argc, char* argv[])
     std::string right_robot_urdf = argv[4];
 
     // Print description
-    spdlog::info(
-        ">>> Tutorial description <<<\nThis tutorial shows how to use the self collision monitor "
-        "to keep the left and right robot from hitting each other.\n");
+    std::cout << ">>> Tutorial description <<<\nThis tutorial shows how to use the self collision "
+                 "monitor to keep the left and right robot from hitting each other.\n"
+              << std::endl;
 
     try {
         // DRDK Initialization
@@ -72,11 +71,11 @@ int main(int argc, char* argv[])
 
         // Use 10 cm safety distance, leaving some buffer for the robots to decelerate
         coll_monitor.SetMinDistance(0.1);
-        spdlog::info("Safety distance set to 10 cm");
+        std::cout << "Safety distance set to 10 cm" << std::endl;
 
         // Start collision monitor and keep it running in the background
         coll_monitor.Start();
-        spdlog::info("Self-collision monitor started");
+        std::cout << "Self-collision monitor started" << std::endl;
 
         // Move the two robots to home pose
         robot_pair.SwitchMode(rdk::Mode::NRT_PLAN_EXECUTION);
@@ -84,10 +83,10 @@ int main(int argc, char* argv[])
         do {
             std::this_thread::sleep_for(std::chrono::seconds(1));
         } while (robot_pair.busy());
-        spdlog::info("Robot pair reached home");
+        std::cout << "Robot pair reached home" << std::endl;
 
         // Move the two robots to the same Cartesian location in world
-        spdlog::info("Moving the robots towards each other");
+        std::cout << "Moving the robots towards each other" << std::endl;
         robot_pair.SwitchMode(rdk::Mode::NRT_CARTESIAN_MOTION_FORCE);
         std::array<double, rdk::kPoseSize> target_pose = {0.5, 0.0, 0.3, 0, 0, 1, 0};
         robot_pair.SendCartesianMotionForce({target_pose, target_pose});
@@ -97,10 +96,10 @@ int main(int argc, char* argv[])
             std::this_thread::sleep_for(std::chrono::seconds(1));
         } while (!robot_pair.stopped());
 
-        spdlog::info("Program finished");
+        std::cout << "Program finished" << std::endl;
 
     } catch (const std::exception& e) {
-        spdlog::error(e.what());
+        std::cerr << "[error] " << e.what() << std::endl;
         return 1;
     }
 
