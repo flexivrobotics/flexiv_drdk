@@ -6,6 +6,8 @@
 #ifndef FLEXIV_DRDK_BIMANUAL_PRIMITIVES_HPP_
 #define FLEXIV_DRDK_BIMANUAL_PRIMITIVES_HPP_
 
+#include "export.hpp"
+
 #include "robot_pair.hpp"
 
 namespace flexiv {
@@ -25,7 +27,7 @@ enum class ReferenceArm
  * @class BimanualPrimitives
  * @brief Interface to execute various bimanual manipulation primitives.
  */
-class BimanualPrimitives
+class DRDK_API BimanualPrimitives
 {
 public:
     /**

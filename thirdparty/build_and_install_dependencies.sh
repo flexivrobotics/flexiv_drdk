@@ -60,14 +60,14 @@ for arg in "$@"; do
   esac
 done
 
-# Build and install all dependencies to INSTALL_DIR
+# Build and install all dependencies to INSTALL_DIR.
+# DRDK is shipped as a self-contained shared library that statically embeds and symbol-hides its
+# thirdparty dependencies, so none of those has to be built here. flexiv_rdk is the only remaining
+# dependency, because rdk:: types appear in the public flexiv::drdk API.
 if $SKIP_RDK; then
-    echo "SKipping flexiv_rdk"
+    echo "Skipping flexiv_rdk"
 else
     bash $SCRIPTPATH/scripts/install_flexiv_rdk.sh
 fi
-bash $SCRIPTPATH/scripts/install_boost.sh
-bash $SCRIPTPATH/scripts/install_assimp.sh
-bash $SCRIPTPATH/scripts/install_coal.sh
 
 echo ">>>>> Finished: flexiv_drdk/thirdparty/build_and_install_dependencies.sh <<<<<"

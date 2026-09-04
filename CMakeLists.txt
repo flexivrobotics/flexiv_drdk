@@ -11,14 +11,14 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Release" "Debug" "RelWithDebInfo" "MinSizeRel")
 
-# Set static library according to platform
+# Select the prebuilt library for this platform. DRDK is shipped as a self-contained shared library.
 message(STATUS "OS: ${CMAKE_SYSTEM_NAME}")
 message(STATUS "Processor: ${CMAKE_SYSTEM_PROCESSOR}")
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
-    set(DRDK_LIB "libflexiv_drdk.x86_64-linux-gnu.a")
+    set(DRDK_LIB "libflexiv_drdk.x86_64-linux-gnu.so")
   elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
-    set(DRDK_LIB "libflexiv_drdk.aarch64-linux-gnu.a")
+    set(DRDK_LIB "libflexiv_drdk.aarch64-linux-gnu.so")
   else()
     message(FATAL_ERROR "Linux with ${CMAKE_SYSTEM_PROCESSOR} processor is currently not supported.")
   endif()
@@ -26,27 +26,10 @@ else()
     message(FATAL_ERROR "${CMAKE_SYSTEM_NAME} is currently not supported.")
 endif()
 
-# Option to support ROS2 Jazzy
-option(DRDK_SUPPORT_ROS2_JAZZY "Use DRDK library compatible with ROS2 Jazzy" OFF)
-if(DRDK_SUPPORT_ROS2_JAZZY)
-  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
-      set(DRDK_LIB "libflexiv_drdk.x86_64-linux-gnu.ros2-jazzy.a")
-    elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
-      set(DRDK_LIB "libflexiv_drdk.aarch64-linux-gnu.ros2-jazzy.a")
-    else()
-      message(FATAL_ERROR 
-        "Compatibility with ROS2 Jazzy is currently not supported on Linux with ${CMAKE_SYSTEM_PROCESSOR} processor.")
-    endif()
-  else()
-    message(FATAL_ERROR "Compatibility with ROS2 Jazzy is currently not supported on ${CMAKE_SYSTEM_NAME}.")
-  endif()
-endif()
-
 # Parse expected hash of the library file
 file(READ ${CMAKE_CURRENT_SOURCE_DIR}/lib/${DRDK_LIB}.sha256 EXPECTED_HASH)
 
-# Download the library file from GitHub 
+# Download the library file from GitHub
 set(DRDK_LIB_URL https://github.com/flexivrobotics/flexiv_drdk/releases/download/v${PROJECT_VERSION}/${DRDK_LIB})
 message(STATUS "Downloading ${DRDK_LIB_URL} ...")
 file(DOWNLOAD ${DRDK_LIB_URL} ${CMAKE_CURRENT_BINARY_DIR}/${DRDK_LIB}
@@ -68,19 +51,12 @@ endif()
 find_package(flexiv_rdk REQUIRED)
 message(STATUS "Found flexiv_rdk v${flexiv_rdk_VERSION}: ${flexiv_rdk_DIR}")
 
-# coal
-find_package(coal REQUIRED)
-message(STATUS "Found coal v${coal_VERSION}: ${coal_DIR}")
-
-# assimp: dependency of coal but coal didn't handle it well so we need to find it for coal
-find_package(assimp REQUIRED)
-message(STATUS "Found assimp v${assimp_VERSION}: ${assimp_DIR}")
-
 # ===================================================================
 #      CREATE LIBRARY
 # ===================================================================
-# Create static library target with dummy source
-add_library(${PROJECT_NAME} STATIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/dummy.cpp)
+# Create the library target with a dummy source. The dummy output is replaced at install time by
+# the downloaded prebuilt shared library (see FlexivInstallLibrary).
+add_library(${PROJECT_NAME} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/lib/dummy.cpp)
 
 # Create an alias of the target with flexiv namespace
 add_library(flexiv::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
@@ -92,10 +68,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 
 # Link to dependencies
+# flexiv_rdk is the only remaining public dependency, because rdk:: types appear in the public
+# flexiv::drdk API headers. Everything else is embedded in the shared library.
 target_link_libraries(${PROJECT_NAME} PUBLIC
   flexiv::flexiv_rdk
-  coal::coal
-  assimp::assimp
 )
 
 # Use moderate compiler warning option

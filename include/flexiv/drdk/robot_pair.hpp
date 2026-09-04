@@ -6,6 +6,8 @@
 #ifndef FLEXIV_DRDK_ROBOT_PAIR_HPP_
 #define FLEXIV_DRDK_ROBOT_PAIR_HPP_
 
+#include "export.hpp"
+
 #include <flexiv/rdk/robot.hpp>
 #include <memory>
 #include <map>
@@ -20,7 +22,7 @@ using namespace rdk;
  * @brief Main interface to simultaneously control a pair of robots. The commands and requests are
  * sent to both robots in parallel.
  */
-class RobotPair
+class DRDK_API RobotPair
 {
 public:
     /**
