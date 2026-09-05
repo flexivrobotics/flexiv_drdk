@@ -123,12 +123,18 @@ public:
     /**
      * @brief [Non-blocking] Whether any robot in the pair is in fault state.
      * @return True: either robot has fault; false: both robots are normal.
+     * @note A robot that enters fault state resets its control mode to rdk::Mode::IDLE and discards
+     * all commands sent so far. After the fault is cleared, SwitchMode() must be called again
+     * before that robot accepts new commands, see ClearFault().
      */
     bool fault() const;
 
     /**
      * @brief [Non-blocking] Which robot in the pair is in fault state.
      * @return True: this robot has fault; false: this robot is normal.
+     * @note Only the faulted robot has its control mode reset, see fault(). The other robot stays
+     * in the control mode it was in, so the two robots in the pair can end up in different control
+     * modes until SwitchMode() is called again.
      */
     std::pair<bool, bool> which_fault() const;
 
@@ -219,6 +225,8 @@ public:
      * control modes.
      * @warning If either robot is still moving when this function is called, it will automatically
      * stop before making the mode transition.
+     * @warning A mode switch is rejected while a robot is in fault state, since that robot cannot
+     * move until the fault is cleared. Call ClearFault() first.
      */
     void SwitchMode(const std::pair<Mode, Mode>& modes);
 
@@ -232,6 +240,8 @@ public:
      * @param[in] mask True: stop this robot; false: skip this robot.
      * @throw std::runtime_error if failed to stop the robot.
      * @note This function blocks until the robot comes to a complete stop.
+     * @note A robot that is already in fault state is skipped, because entering fault state stops
+     * that robot and resets its control mode to IDLE by itself.
      */
     void Stop(std::pair<bool, bool> mask);
 
@@ -250,6 +260,8 @@ public:
      * @throw std::runtime_error if failed to deliver the request to the connected robot pair.
      * @note This function blocks until the faults on both robots are successfully cleared or
      * [timeout_sec] has elapsed.
+     * @note A robot that was in fault stays in rdk::Mode::IDLE after the fault is cleared, because
+     * entering fault state has reset its control mode. Call SwitchMode() to re-arm the pair.
      * @warning Clearing a critical fault through this function without a power cycle requires a
      * dedicated device, which may not be installed in older robot models.
      */
@@ -320,7 +332,8 @@ public:
      * @param[in] indices Respective indices of the plans to execute, can be obtained via
      * plan_list().
      * @param[in] continue_exec Whether to continue executing the plan when the DRDK program is
-     * closed or the connection is lost.
+     * closed or the connection is lost. This does not apply to faults: a robot that enters fault
+     * state always resets its control mode to rdk::Mode::IDLE, see fault().
      * @param[in] block_until_started Whether to wait for the commanded plan to finish loading
      * and start execution before the function returns. Depending on the amount of computation
      * needed to get the plan ready, the loading process typically takes no more than 200 ms.
@@ -341,7 +354,8 @@ public:
      * names.
      * @param[in] names Respective names of the plans to execute, can be obtained via plan_list().
      * @param[in] continue_exec Whether to continue executing the plan when the DRDK program is
-     * closed or the connection is lost.
+     * closed or the connection is lost. This does not apply to faults: a robot that enters fault
+     * state always resets its control mode to rdk::Mode::IDLE, see fault().
      * @param[in] block_until_started Whether to wait for the commanded plan to finish loading
      * and start execution before the function returns. Depending on the amount of computation
      * needed to get the plan ready, the loading process typically takes no more than 200 ms.
@@ -367,12 +381,6 @@ public:
      */
     void PausePlan(std::pair<bool, bool> toggles);
 
-    /**
-     * @brief [Blocking] Stop one robot in the pair and transit its control mode to IDLE.
-     * @param[in] mask True: stop this robot; false: skip this robot.
-     * @throw std::runtime_error if failed to stop the robot.
-     * @note This function blocks until the robot comes to a complete stop.
-     */
     /**
      * @brief [Blocking] Stop the execution of the current plan for one robot in the pair.
      * @param[in] mask True: stop plan for this robot; false: skip this robot.
