@@ -9,7 +9,7 @@ __copyright__ = "Copyright (C) 2016-2025 Flexiv Ltd. All Rights Reserved."
 __author__ = "Flexiv"
 
 import argparse
-import spdlog
+import logging
 import flexivdrdk
 
 
@@ -29,7 +29,8 @@ def main():
     args = argparser.parse_args()
 
     # Define alias
-    logger = spdlog.ConsoleLogger("Example")
+    logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
+    logger = logging.getLogger("Example")
 
     # Print description
     logger.info(
@@ -47,7 +48,7 @@ def main():
         # ==========================================================================================
         # Clear fault on the connected robot if any
         if robot_pair.fault():
-            logger.warn("Fault occurred on the connected robot, trying to clear ...")
+            logger.warning("Fault occurred on the connected robot, trying to clear ...")
             # Try to clear the fault on both robots
             result = robot_pair.ClearFault()
             # If fault is not cleared on both robots

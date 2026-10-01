@@ -6,6 +6,8 @@
 #ifndef FLEXIV_DRDK_GRIPPER_PAIR_HPP_
 #define FLEXIV_DRDK_GRIPPER_PAIR_HPP_
 
+#include "export.hpp"
+
 #include "robot_pair.hpp"
 #include <flexiv/rdk/gripper.hpp>
 
@@ -19,7 +21,7 @@ using namespace rdk;
  * @brief Interface to simultaneously control a pair of grippers installed respectively on the pair
  * of robots.
  */
-class GripperPair
+class DRDK_API GripperPair
 {
 public:
     /**

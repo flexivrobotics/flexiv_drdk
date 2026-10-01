@@ -6,6 +6,8 @@
 #ifndef FLEXIV_DRDK_SELF_COLLISION_MONITOR_HPP_
 #define FLEXIV_DRDK_SELF_COLLISION_MONITOR_HPP_
 
+#include "export.hpp"
+
 #include "robot_pair.hpp"
 
 namespace flexiv {
@@ -16,7 +18,7 @@ namespace drdk {
  * @brief Monitor any imminent collision between the two robots in the pair. Both robots will be
  * stopped if they are about to collide, regardless of the current task and control mode.
  */
-class SelfCollisionMonitor
+class DRDK_API SelfCollisionMonitor
 {
 public:
     /**

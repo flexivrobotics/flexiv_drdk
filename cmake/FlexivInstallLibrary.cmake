@@ -82,12 +82,15 @@ macro(FlexivInstallLibrary)
             DESTINATION "lib/cmake/${PROJECT_NAME}"
             )
 
-    # Replace the dummy static lib with the actual static lib 
-    install(CODE 
-            "file(REMOVE ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX})")
+    # Replace the dummy library built above with the actual prebuilt shared library that was
+    # downloaded (.so on Linux, .dylib on macOS).
+    set(_drdk_installed_lib
+        "${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    install(CODE
+            "file(REMOVE ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/${_drdk_installed_lib})")
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${DRDK_LIB}
             DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            RENAME ${CMAKE_STATIC_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}
+            RENAME ${_drdk_installed_lib}
             )
 
     # Use the CPack Package Generator

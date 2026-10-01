@@ -7,7 +7,6 @@
 
 #include <flexiv/drdk/robot_pair.hpp>
 #include <flexiv/rdk/utility.hpp>
-#include <spdlog/spdlog.h>
 
 #include <iostream>
 #include <string>
@@ -42,9 +41,9 @@ int main(int argc, char* argv[])
     std::string right_robot_sn = argv[2];
 
     // Print description
-    spdlog::info(
-        ">>> Tutorial description <<<\nThis tutorial clears minor or critical faults, if any, of "
-        "the connected robots.\n");
+    std::cout << ">>> Tutorial description <<<\nThis tutorial clears minor or critical faults, if "
+                 "any, of the connected robots.\n"
+              << std::endl;
 
     try {
         // DRDK Initialization
@@ -56,19 +55,20 @@ int main(int argc, char* argv[])
         // =========================================================================================
         // Clear fault on the connected robots if any
         if (robot_pair.fault()) {
-            spdlog::warn("Fault occurred on one of the connected robots, trying to clear ...");
+            std::cerr << "[warn] Fault occurred on one of the connected robots, trying to clear ..."
+                      << std::endl;
             // Try to clear the fault
             auto result = robot_pair.ClearFault();
             if (!(result.first && result.second)) {
-                spdlog::error("Fault cannot be cleared, exiting ...");
+                std::cerr << "[error] Fault cannot be cleared, exiting ..." << std::endl;
                 return 1;
             }
-            spdlog::info("Fault on the connected robot is cleared");
+            std::cout << "Fault on the connected robot is cleared" << std::endl;
         } else {
-            spdlog::info("No fault on the connected robot");
+            std::cout << "No fault on the connected robot" << std::endl;
         }
     } catch (const std::exception& e) {
-        spdlog::error(e.what());
+        std::cerr << "[error] " << e.what() << std::endl;
         return 1;
     }
 
