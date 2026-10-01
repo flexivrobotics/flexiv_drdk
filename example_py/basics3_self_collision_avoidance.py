@@ -11,7 +11,7 @@ __author__ = "Flexiv"
 
 import time
 import argparse
-import spdlog
+import logging
 import flexivdrdk
 from flexivrdk import Mode  # for type definition
 
@@ -40,7 +40,8 @@ def main():
     args = argparser.parse_args()
 
     # Define alias
-    logger = spdlog.ConsoleLogger("Example")
+    logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
+    logger = logging.getLogger("Example")
 
     # Print description
     logger.info(
