@@ -29,14 +29,6 @@ def main():
         "right_robot_sn",
         help="Serial number of the right robot to connect. Remove any space, e.g. Rizon4s-100002",
     )
-    argparser.add_argument(
-        "left_robot_urdf",
-        help="Absolute path to the URDF of the left robot",
-    )
-    argparser.add_argument(
-        "right_robot_urdf",
-        help="Absolute path to the URDF of the right robot",
-    )
     args = argparser.parse_args()
 
     # Define alias
@@ -64,10 +56,10 @@ def main():
 
         # Self Collision Monitor
         # ==========================================================================================
-        # Instantiate self collision monitor interface
-        coll_monitor = flexivdrdk.SelfCollisionMonitor(
-            robot_pair, [args.left_robot_urdf, args.right_robot_urdf]
-        )
+        # Instantiate self collision monitor interface. The collision meshes of both robots are
+        # downloaded from the connected robots. All links are checked for collision by default, the
+        # second argument can be used to skip some of them, e.g. ["base_link"]
+        coll_monitor = flexivdrdk.SelfCollisionMonitor(robot_pair)
 
         # Use 10 cm safety distance, leaving some buffer for the robots to decelerate
         coll_monitor.SetMinDistance(0.1)

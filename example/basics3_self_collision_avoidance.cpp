@@ -20,11 +20,9 @@ using namespace flexiv;
 void PrintHelp()
 {
     // clang-format off
-    std::cout << "Required arguments: [left_robot_sn] [right_robot_sn] [left_robot_urdf] [right_robot_urdf]" << std::endl;
+    std::cout << "Required arguments: [left_robot_sn] [right_robot_sn]" << std::endl;
     std::cout << "    left_robot_sn: Serial number of the left robot to connect. Remove any space, e.g. Rizon4s-100001" << std::endl;
     std::cout << "    right_robot_sn: Serial number of the right robot to connect. Remove any space, e.g. Rizon4s-100002" << std::endl;
-    std::cout << "    left_robot_urdf: Absolute path to the URDF of the left robot" << std::endl;
-    std::cout << "    right_robot_urdf: Absolute path to the URDF of the right robot" << std::endl;
     std::cout << "Optional arguments: None" << std::endl;
     std::cout << std::endl;
     // clang-format on
@@ -35,7 +33,7 @@ int main(int argc, char* argv[])
     // Program Setup
     // =============================================================================================
     // Parse parameters
-    if (argc < 5 || rdk::utility::ProgramArgsExistAny(argc, argv, {"-h", "--help"})) {
+    if (argc < 3 || rdk::utility::ProgramArgsExistAny(argc, argv, {"-h", "--help"})) {
         PrintHelp();
         return 1;
     }
@@ -43,10 +41,6 @@ int main(int argc, char* argv[])
     // Serial numbers of the left and right robot respectively
     std::string left_robot_sn = argv[1];
     std::string right_robot_sn = argv[2];
-
-    // URDF paths of the left and right robot respectively
-    std::string left_robot_urdf = argv[3];
-    std::string right_robot_urdf = argv[4];
 
     // Print description
     std::cout << ">>> Tutorial description <<<\nThis tutorial shows how to use the self collision "
@@ -66,8 +60,10 @@ int main(int argc, char* argv[])
 
         // Self Collision Monitor
         // =========================================================================================
-        // Instantiate self collision monitor interface
-        drdk::SelfCollisionMonitor coll_monitor(robot_pair, {left_robot_urdf, right_robot_urdf});
+        // Instantiate self collision monitor interface. The collision meshes of both robots are
+        // downloaded from the connected robots. All links are checked for collision by default, the
+        // second argument can be used to skip some of them, e.g. {"base_link"}
+        drdk::SelfCollisionMonitor coll_monitor(robot_pair);
 
         // Use 10 cm safety distance, leaving some buffer for the robots to decelerate
         coll_monitor.SetMinDistance(0.1);
