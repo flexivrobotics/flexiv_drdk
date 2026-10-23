@@ -11,6 +11,7 @@ if [ ! -d flexiv_rdk ] ; then
   cd flexiv_rdk
 else
   cd flexiv_rdk
+  git fetch
   git checkout $VER_TAG
 fi
 
